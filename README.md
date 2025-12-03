@@ -1,0 +1,1 @@
+# hardware_proto_manager
