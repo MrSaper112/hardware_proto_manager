@@ -1,6 +1,9 @@
-#include <iostream>
+﻿#include "main.h"
 
-int main() {
+using namespace std;
 
-    return 0;
+int main()
+{
+	cout << "Hello CMake." << endl;
+	return 0;
 }

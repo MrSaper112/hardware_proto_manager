@@ -1,14 +1,58 @@
-cmake_minimum_required(VERSION 3.10)
+﻿cmake_minimum_required(VERSION 3.21)
 
-project(hardware_proto_manager VERSION 1.0)
-
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-include_directories(${PROJECT_SOURCE_DIR}/inc)
-
-set(SOURCES
-    src/main.cpp
+project(hardware_proto
+    VERSION 1.0.0
+    DESCRIPTION "CMake Project"
+    LANGUAGES CXX
 )
 
-add_executable(${PROJECT_NAME} ${SOURCES})
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
+    message(FATAL_ERROR "In-source builds are not allowed. Please use a separate build directory.")
+endif()
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# Clear default flags to avoid conflicts
+set(CMAKE_CXX_FLAGS "" CACHE STRING "" FORCE)
+set(CMAKE_CXX_FLAGS_DEBUG "" CACHE STRING "" FORCE)
+set(CMAKE_CXX_FLAGS_RELEASE "" CACHE STRING "" FORCE)
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "" CACHE STRING "" FORCE)
+set(CMAKE_CXX_FLAGS_MINSIZEREL "" CACHE STRING "" FORCE)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
+
+add_executable(${PROJECT_NAME})
+
+target_sources(${PROJECT_NAME}
+    PRIVATE
+        src/main.cpp
+        inc/main.h
+)
+
+target_compile_features(${PROJECT_NAME}
+    PRIVATE
+        cxx_std_20
+)
+
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/inc
+)
+
+if(MSVC)
+    target_compile_options(${PROJECT_NAME}
+        PRIVATE
+            /W4                     
+            /permissive-            
+            /Zc:__cplusplus       
+            /Zc:preprocessor
+            /O2
+            /EHsc
+    )
+else()
+    target_compile_options(${PROJECT_NAME}
+        PRIVATE
+            -Wall -Wextra -Wpedantic
+            -O3
+    )
+endif()
+
