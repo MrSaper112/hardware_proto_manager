@@ -25,10 +25,11 @@ target_sources(${PROJECT_NAME}
     PRIVATE
         src/main.cpp
         "src/devices/IDevice.cpp" 
-        "src/devices/LedControllerDevice.cpp" 
-        "src/protocols/JsonProtocolAdapter.cpp" 
+        "src/devices/LedControllerDevice.cpp"
+        "src/devices/BootloaderDevice.cpp"
+        "src/protocols/JsonProtocolAdapter.cpp"
         "src/protocols/PlainProtocolAdapter.cpp"
-        "src/transport/RealUartTransport.cpp" 
+        "src/transport/UartTransport.cpp" 
         "src/transport/SimulatedUartTransport.cpp")
 
 target_compile_features(${PROJECT_NAME}

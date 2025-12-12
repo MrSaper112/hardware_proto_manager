@@ -4,8 +4,7 @@
 
 class UartTransport : public ITransport {
 public:
-	UartTransport() = default;
-	~UartTransport() = default;
+	UartTransport(const std::string& port, const uint32_t baudrate): ITransport(port, baudrate) {};
 
 	void connect() override;
 	void disconnect() override;

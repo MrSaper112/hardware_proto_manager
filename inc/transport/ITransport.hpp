@@ -1,11 +1,16 @@
 #pragma once
+#include <cstdint>
 #include <string>
+#include <utility>
 
 class ITransport {
 public:
-	ITransport() = default;
-	~ITransport() = default;
+	ITransport(std::string port, const uint32_t baudrate):
+		m_portName(std::move(port)), m_baudRate(baudrate) {};
 
+	virtual ~ITransport() = default;
+
+	virtual void workLoop() = 0;
 	virtual void connect() = 0;
 	virtual void disconnect() = 0;
 	virtual void sendData(const char* data, size_t size) = 0;
@@ -13,5 +18,5 @@ public:
 
 protected:
 	std::string m_portName;
-	int m_baudRate;
+	uint32_t m_baudRate;
 };
