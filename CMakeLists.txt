@@ -12,7 +12,6 @@ endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Clear default flags to avoid conflicts
 set(CMAKE_CXX_FLAGS "" CACHE STRING "" FORCE)
 set(CMAKE_CXX_FLAGS_DEBUG "" CACHE STRING "" FORCE)
 set(CMAKE_CXX_FLAGS_RELEASE "" CACHE STRING "" FORCE)
@@ -25,8 +24,12 @@ add_executable(${PROJECT_NAME})
 target_sources(${PROJECT_NAME}
     PRIVATE
         src/main.cpp
-        inc/main.h
-)
+        "src/devices/IDevice.cpp" 
+        "src/devices/LedControllerDevice.cpp" 
+        "src/protocols/JsonProtocolAdapter.cpp" 
+        "src/protocols/PlainProtocolAdapter.cpp"
+        "src/transport/RealUartTransport.cpp" 
+        "src/transport/SimulatedUartTransport.cpp")
 
 target_compile_features(${PROJECT_NAME}
     PRIVATE

@@ -1,4 +1,7 @@
-﻿#include "main.h"
+﻿#include "main.hpp"
+#include "transport/ITransport.hpp"
+#include "protocols/IProtocolAdapter.hpp"
+#include "devices/IDevice.hpp"
 
 using namespace std;
 
