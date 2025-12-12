@@ -24,8 +24,12 @@ add_executable(${PROJECT_NAME})
 target_sources(${PROJECT_NAME}
     PRIVATE
         src/main.cpp
-        "inc/main.hpp"
- "src/devices/IDevice.cpp" "inc/devices/IDevice.hpp" "src/protocols/IProtocolAdapter.cpp" "src/transport/ITransport.cpp")
+        "src/devices/IDevice.cpp" 
+        "src/devices/LedControllerDevice.cpp" 
+        "src/protocols/JsonProtocolAdapter.cpp" 
+        "src/protocols/PlainProtocolAdapter.cpp"
+        "src/transport/RealUartTransport.cpp" 
+        "src/transport/SimulatedUartTransport.cpp")
 
 target_compile_features(${PROJECT_NAME}
     PRIVATE

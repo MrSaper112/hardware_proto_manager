@@ -1,1 +1,0 @@
-#include "protocols/IProtocolAdapter.hpp"

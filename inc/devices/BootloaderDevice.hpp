@@ -2,11 +2,8 @@
 
 #include "IDevice.hpp"
 
-class LedControllerDevice : public IDevice {
+class BootloaderDevice : public IDevice {
 public:
-	LedControllerDevice() = default;
-	~LedControllerDevice() override = default;
-	void turnOn();
-	void turnOff();
-	void setBrightness(int level);
+	BootloaderDevice() = default;
+	~BootloaderDevice() override = default;
 };

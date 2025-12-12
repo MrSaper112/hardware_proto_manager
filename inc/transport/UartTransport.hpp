@@ -2,10 +2,10 @@
 
 #include "ITransport.hpp"
 
-class IProtocolAdapter : public ITransport {
+class UartTransport : public ITransport {
 public:
-	IProtocolAdapter() = default;
-	~IProtocolAdapter() override = default;
+	UartTransport() = default;
+	~UartTransport() = default;
 
 	void connect() override;
 	void disconnect() override;
