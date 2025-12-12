@@ -19,18 +19,17 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "" CACHE STRING "" FORCE)
 set(CMAKE_CXX_FLAGS_MINSIZEREL "" CACHE STRING "" FORCE)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
 
-add_executable(${PROJECT_NAME})
 
-target_sources(${PROJECT_NAME}
-    PRIVATE
-        src/main.cpp
-        "src/devices/IDevice.cpp" 
-        "src/devices/LedControllerDevice.cpp"
-        "src/devices/BootloaderDevice.cpp"
-        "src/protocols/JsonProtocolAdapter.cpp"
-        "src/protocols/PlainProtocolAdapter.cpp"
-        "src/transport/UartTransport.cpp" 
-        "src/transport/SimulatedUartTransport.cpp")
+set(MAIN_FILE "${PROJECT_SOURCE_DIR}/src/main.cpp")
+
+file(GLOB_RECURSE OTHER_FILES
+    "${PROJECT_SOURCE_DIR}/src/*.cpp"
+)
+list(REMOVE_ITEM OTHER_FILES "${MAIN_FILE}")
+
+set(SRC_FILES ${MAIN_FILE} ${OTHER_FILES})
+
+add_executable(${PROJECT_NAME} ${SRC_FILES})
 
 target_compile_features(${PROJECT_NAME}
     PRIVATE
@@ -45,9 +44,9 @@ target_include_directories(${PROJECT_NAME}
 if(MSVC)
     target_compile_options(${PROJECT_NAME}
         PRIVATE
-            /W4                     
-            /permissive-            
-            /Zc:__cplusplus       
+            /W4
+            /permissive-
+            /Zc:__cplusplus
             /Zc:preprocessor
             /O2
             /EHsc
@@ -59,4 +58,3 @@ else()
             -O3
     )
 endif()
-

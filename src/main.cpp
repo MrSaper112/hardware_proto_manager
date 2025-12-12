@@ -2,6 +2,7 @@
 #include "transport/ITransport.hpp"
 #include "protocols/IProtocolAdapter.hpp"
 #include "devices/IDevice.hpp"
+#include <iostream>
 
 using namespace std;
 
