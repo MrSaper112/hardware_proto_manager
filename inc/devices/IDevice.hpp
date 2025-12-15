@@ -13,5 +13,5 @@ public:
 	virtual void disconnect() = 0;
 protected:
 	IProtocolAdapter* m_protocol = nullptr;
-	ITransport* m_transport = nullptr;
+	//ITransport* m_transport = nullptr;
 };

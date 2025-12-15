@@ -29,7 +29,7 @@ list(REMOVE_ITEM OTHER_FILES "${MAIN_FILE}")
 
 set(SRC_FILES ${MAIN_FILE} ${OTHER_FILES})
 
-add_executable(${PROJECT_NAME} ${SRC_FILES})
+add_executable(${PROJECT_NAME} ${SRC_FILES} "inc/transport/UartUtils.hpp" "src/transport/TransportTypes.cpp")
 
 target_compile_features(${PROJECT_NAME}
     PRIVATE
