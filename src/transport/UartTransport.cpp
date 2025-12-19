@@ -1,4 +1,5 @@
 #include "transport/UartTransport.hpp"
+#include <iostream>
 
 using namespace transport;
 
@@ -54,7 +55,23 @@ bool UartTransport::is_open() const
 
 int UartTransport::send(const Byte* data, size_t length)
 {
-	return static_cast<int>(length);
+	if (!is_open()) {
+		throw PortException("Port not open", ErrorCode::PortNotOpen);
+	}
+
+	if (data == nullptr || length == 0) {
+		return 0;
+	}
+
+#ifdef _WIN32
+
+#else
+	ssize_t bytes_written = ::write(m_fd, data, length);
+	if (bytes_written < 0) {
+		throw PortException("Failed to write to port", ErrorCode::OperationFailed);
+	}
+	return bytes_written;
+#endif
 }
 
 int UartTransport::receive(Byte* buffer, size_t length, uint32_t timeout_ms)
@@ -83,6 +100,7 @@ ErrorCode transport::UartTransport::configure_windows()
 ErrorCode transport::UartTransport::configure_unix()
 {
 	struct termios options;
+	std::cout << "Opening port: " << m_config.port << std::endl;
 	m_fd = ::open(m_config.port.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
 	if (m_fd == -1) {
 		return ErrorCode::PortNotFound;

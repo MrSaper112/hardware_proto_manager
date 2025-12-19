@@ -11,7 +11,7 @@ int main()
 
 	auto config = SerialConfig();
 	config.baudrate = BaudRate::Baud115200;
-	config.port = "/dev/ttyUSB0";
+	config.port = "/dev/pts/3";
 	config.databits = DataBits::Bits8;
 	config.stopbits = StopBits::One;
 	config.parity = Parity::None;
@@ -20,6 +20,17 @@ int main()
 	
 	auto status = uart_transport.open();
 	cout << "Open status: " << static_cast<int>(status) << endl;
+	if (status != ErrorCode::Success) {
+		return -1;
+	}
 
+	std::string mes = "Hello UART";
+
+	while (1)
+	{
+		uart_transport.send(reinterpret_cast<const transport::Byte*>(mes.data()), mes.length());
+
+		this_thread::sleep_for(chrono::milliseconds(2000));
+	}
 	return 0;
 }
