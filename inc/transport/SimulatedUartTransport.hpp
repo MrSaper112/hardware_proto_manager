@@ -2,14 +2,13 @@
 
 #include "ITransport.hpp"
 
-class SimulatedUartTransport : public ITransport {
-	
-public:
-	SimulatedUartTransport() = default;
-	~SimulatedUartTransport() override = default;
+namespace transport
+{
+	class SimulatedUartTransport : public ITransport {
 
-	void connect() override;
-	void disconnect() override;
-	void sendData(const char* data, size_t size) override;
-	void receiveData(char* buffer, size_t size) override;
+	public:
+		SimulatedUartTransport() = default;
+		~SimulatedUartTransport() override = default;
+
+	};
 }
