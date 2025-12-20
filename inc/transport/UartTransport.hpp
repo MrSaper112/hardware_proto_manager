@@ -37,7 +37,6 @@ namespace transport
 
 	private: 
 		std::thread m_async_thread;
-		std::atomic<bool> m_async_running;
 		std::queue<ByteBuffer> m_rx_queue;
 
 

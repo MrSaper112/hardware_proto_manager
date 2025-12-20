@@ -24,3 +24,5 @@ CTestTestfile.cmake
 *.obj
 *.lo
 *.slo
+
+.venv/

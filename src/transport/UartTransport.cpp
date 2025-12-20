@@ -4,8 +4,7 @@
 using namespace transport;
 
 UartTransport::UartTransport(const SerialConfig &config): 
-	ITransport(config), 
-	m_async_running(false)
+	ITransport(config)
 {
 #ifdef _WIN32
 	m_handle = INVALID_HANDLE_VALUE;

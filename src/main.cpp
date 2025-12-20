@@ -11,7 +11,7 @@ int main()
 
 	auto config = SerialConfig();
 	config.baudrate = BaudRate::Baud115200;
-	config.port = "/dev/pts/3";
+	config.port = "/dev/ttyS21";
 	config.databits = DataBits::Bits8;
 	config.stopbits = StopBits::One;
 	config.parity = Parity::None;
@@ -24,7 +24,7 @@ int main()
 		return -1;
 	}
 
-	std::string mes = "Hello UART";
+	std::string mes = "Hello UART\n";
 
 	while (1)
 	{
