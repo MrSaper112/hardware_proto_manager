@@ -44,7 +44,7 @@ ErrorCode UartTransport::open()
 
 	try
 	{
-		this->startReciveThread();
+		// this->startReciveThread();
 	}
 	catch (std::exception ex)
 	{
@@ -73,13 +73,18 @@ void UartTransport::receiveThread()
 				};
 
 				std::cout << "Recived: ";
-				for (size_t i = 0; i < bytes_count; i++)
+				if (rx_buff[0] == START_BYTE && rx_buff[bytes_count + 1] == END_BYTE)
 				{
-					std::cout << rx_buff[i];
-				}
-				std::cout << std::endl;
+					for (size_t i = 0; i < bytes_count; i++)
+					{
+						std::cout << rx_buff[i];
+					}
+					std::cout << std::endl;
 
-				this->send(rx_buff, bytes_count);
+					Byte ack = {};
+					snprintf(&ack, 1, "%x", ACK_BYTE);
+					this->send(&ack, 1);
+				}
 			}
 			catch (const std::exception ex)
 			{
@@ -88,14 +93,25 @@ void UartTransport::receiveThread()
 
 			usleep(thread_timeout * 1);
 		}
-
-		
 	};
 };
 
 ErrorCode UartTransport::close()
 {
 	return ErrorCode::Success;
+}
+
+int UartTransport::sendMessage(const Message* mes)
+{
+	Byte start_seq = static_cast<Byte>(START_BYTE);
+	this->send(&start_seq, 1);
+
+	auto serialized = mes->serialize();
+	this->send(serialized.data(), serialized.size());
+
+	Byte end_seq = static_cast<Byte>(END_BYTE);
+	this->send(&end_seq, 1);
+	return 0;
 }
 
 int UartTransport::send(const Byte *data, size_t length)
@@ -113,7 +129,7 @@ int UartTransport::send(const Byte *data, size_t length)
 #ifdef _WIN32
 
 #else
-	std::cout << "Sending: " << data << std::endl;
+	std::cout << "Sending: " << length << " bytes" << std::endl;
 
 	ssize_t bytes_written = ::write(m_fd, data, length);
 	if (bytes_written < 0)

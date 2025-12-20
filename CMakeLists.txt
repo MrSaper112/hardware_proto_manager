@@ -54,7 +54,7 @@ if(MSVC)
 else()
     target_compile_options(${PROJECT_NAME}
         PRIVATE
-            -Wall -Wextra -Wpedantic
+            -Wall -Wextra
             -O3
     )
 endif()

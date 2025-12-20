@@ -19,18 +19,33 @@ def connect_to_serial():
 
     counter = 0
     mes = ""
+    data = []
     while serial_con.is_open: 
         while serial_con.inWaiting():
-            mes += serial_con.read(1).decode("ASCII")
-                        
+            ddmes = serial_con.read(1)
+            if ddmes.hex() == '01':
+                data = []
+                
+            if ddmes.hex() == '17':
+                break
+                            
+            if ddmes.hex() == "06":
+                print('ack')
+                
+            data.append(ddmes)
             time.sleep(0.001)
-        time.sleep(0.1)
-        if len(mes) > 0: 
-            print(f"Recived {mes}")
-            mes = ""
             
-        counter+=1 
-        if counter % 20 == 0:
+        if len(data) > 0:
+            print(", ".join([f"0x{dat.hex()}" for dat in data]))
+            print("".join([dat.decode("ASCII") for dat in data]))
+            data = []
+            
+            
+        time.sleep(0.1)
+
+            
+        # counter+=1 
+        if counter % 20 == 1:
             ran = str(random.randint(1, 69) * random.randint(1,4)).encode("ASCII")
             print(f"Sending {ran}")
             serial_con.write(ran)

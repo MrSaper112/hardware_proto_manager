@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <termios.h>
 #include <sys/ioctl.h>
-
+#include "messages/Message.hpp"
 
 
 #ifdef _WIN32
@@ -17,8 +17,12 @@
 #endif
 
 
-#define RX_BUFF_SIZE 1024
-#define TX_BUFF_SIZE 1024
+#define RX_BUFF_SIZE 	 1024
+#define TX_BUFF_SIZE 	 1024
+
+#define START_BYTE 		 0x01
+#define END_BYTE 		 0x17
+#define ACK_BYTE         0x06
 
 namespace transport
 {
@@ -30,9 +34,8 @@ namespace transport
 		ErrorCode open() override;
 		ErrorCode close() override;
 
-		int send(const Byte* data, size_t length) override;
-		int receive(Byte* buffer, size_t length, uint32_t timeout_ms) override;
-
+	public:
+		int sendMessage(const Message* mes);
 		int available() const override;
 		ErrorCode flush() override;
 
@@ -41,6 +44,9 @@ namespace transport
 			return m_config;
 		};
 
+
+		int send(const Byte* data, size_t length) override;
+		int receive(Byte* buffer, size_t length, uint32_t timeout_ms) override;
 	private: 
 		void startReciveThread()
 		{
