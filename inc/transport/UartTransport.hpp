@@ -44,13 +44,12 @@ namespace transport
 	private: 
 		void startReciveThread()
 		{
-			m_thread = std::thread(&UartTransport::reciveThread, this);
+			m_thread = std::thread(&UartTransport::receiveThread, this);
 		};
 
-		void reciveThread();
+		void receiveThread();
 
 	private: 
-		std::thread m_async_thread;
 		std::queue<ByteBuffer> m_rx_queue;
 
 		uint16_t thread_timeout = 1000;

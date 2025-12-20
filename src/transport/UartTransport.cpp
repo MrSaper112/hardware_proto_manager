@@ -53,7 +53,7 @@ ErrorCode UartTransport::open()
 	return status;
 }
 
-void UartTransport::reciveThread()
+void UartTransport::receiveThread()
 {
 	int bytes_count = 0;
 
@@ -65,7 +65,7 @@ void UartTransport::reciveThread()
 			try
 			{
 				memset(&rx_buff, 0, RX_BUFF_SIZE);
-				
+
 				if (this->receive(rx_buff, bytes_count, 100) < 0)
 				{
 					std::cout << "Invalid read" << std::endl;
@@ -81,7 +81,7 @@ void UartTransport::reciveThread()
 
 				this->send(rx_buff, bytes_count);
 			}
-			catch (std::exception ex)
+			catch (const std::exception ex)
 			{
 				std::cout << ex.what() << std::endl;
 			};
@@ -113,7 +113,7 @@ int UartTransport::send(const Byte *data, size_t length)
 #ifdef _WIN32
 
 #else
-	std::cout << "Sending: " << rx_buff << std::endl;
+	std::cout << "Sending: " << data << std::endl;
 
 	ssize_t bytes_written = ::write(m_fd, data, length);
 	if (bytes_written < 0)
@@ -126,13 +126,20 @@ int UartTransport::send(const Byte *data, size_t length)
 
 int UartTransport::receive(Byte *buffer, size_t length, uint32_t timeout_ms)
 {
-	return read(m_fd, buffer, sizeof(length));
+	return read(m_fd, buffer, length);
 }
 
 int UartTransport::available() const
 {
 	int bytes;
-	ioctl(m_fd, FIONREAD, &bytes);
+
+	int status = ioctl(m_fd, FIONREAD, &bytes);
+	if (status < 0)
+	{
+		std::cout << "Cannot read available bytes" << std::endl;
+		return 0;
+	}
+
 	return bytes;
 }
 

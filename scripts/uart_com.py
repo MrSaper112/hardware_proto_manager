@@ -3,7 +3,7 @@ import serial
 import random
 
 COM_PORT = "/tmp/tty20"
-BAUDRATE = 9200
+BAUDRATE = 115200
 
 serial_con = None
 
