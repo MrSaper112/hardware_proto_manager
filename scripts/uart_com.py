@@ -1,8 +1,8 @@
 import time
 import serial
+import random
 
-
-COM_PORT = "/dev/ttyS20"
+COM_PORT = "/tmp/tty20"
 BAUDRATE = 9200
 
 serial_con = None
@@ -15,15 +15,26 @@ def connect_to_serial():
     
     serial_con = serial.Serial(COM_PORT, BAUDRATE)
     
-    serial_con.write("BUFF".encode("UTF-8"))
+    serial_con.write("BUFF".encode("ASCII"))
 
+    counter = 0
+    mes = ""
     while serial_con.is_open: 
-        if serial_con.inWaiting():
-            buff = serial_con.read(1)
-                
-            print(buff.decode("ASCII"))
-            time.sleep(0.1)
-
+        while serial_con.inWaiting():
+            mes += serial_con.read(1).decode("ASCII")
+                        
+            time.sleep(0.001)
+        time.sleep(0.1)
+        if len(mes) > 0: 
+            print(f"Recived {mes}")
+            mes = ""
+            
+        counter+=1 
+        if counter % 20 == 0:
+            ran = str(random.randint(1, 69) * random.randint(1,4)).encode("ASCII")
+            print(f"Sending {ran}")
+            serial_con.write(ran)
+            
 if __name__ == "__main__":
     serial_con = None
     

@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <string>
+#include <thread> 
 
 #ifdef _WIN32
 	#include <windows.h>
@@ -21,7 +22,6 @@ namespace transport {
 		virtual ~ITransport() = default;
 		virtual ErrorCode open() = 0;
 		virtual ErrorCode close() = 0;
-		virtual bool is_open() const = 0;
 		
 		ConnectionState get_state() const
 		{
@@ -47,9 +47,15 @@ namespace transport {
 			return buffer;
 		}
 
-		virtual size_t available() const = 0;
+		bool is_open() const
+		{
+			return m_con_state == ConnectionState::Open;
+		}
+
+		virtual int available() const = 0;
 		virtual ErrorCode flush() = 0;
 		virtual SerialConfig get_config() const = 0;
+
 	protected:
 		SerialConfig m_config;
 		ConnectionState m_con_state{ ConnectionState::Closed };

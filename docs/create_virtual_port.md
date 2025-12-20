@@ -5,7 +5,7 @@ To create virtaul port in linux systems you can use
 ```bash
 socat -d -d pty,raw,echo=0 pty,raw,echo=0
 
-socat pty,raw,echo=0,link=/dev/ttyS20 pty,raw,echo=0,link=/dev/ttyS21
+socat pty,raw,echo=0,link=tmp/hardware_proto_manager/tty20 pty,raw,echo=0,link=tmp/hardware_proto_manager/ttyS21
 
 ```
 

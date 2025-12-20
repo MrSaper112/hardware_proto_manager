@@ -11,7 +11,7 @@ int main()
 
 	auto config = SerialConfig();
 	config.baudrate = BaudRate::Baud115200;
-	config.port = "/dev/ttyS21";
+	config.port = "/tmp/ttyS21";
 	config.databits = DataBits::Bits8;
 	config.stopbits = StopBits::One;
 	config.parity = Parity::None;
@@ -25,10 +25,11 @@ int main()
 	}
 
 	std::string mes = "Hello UART\n";
+	uart_transport.send(reinterpret_cast<const transport::Byte*>(mes.data()), mes.length());
 
 	while (1)
 	{
-		uart_transport.send(reinterpret_cast<const transport::Byte*>(mes.data()), mes.length());
+		// uart_transport.send(reinterpret_cast<const transport::Byte*>(mes.data()), mes.length());
 
 		this_thread::sleep_for(chrono::milliseconds(2000));
 	}

@@ -3,6 +3,10 @@
 #include "ITransport.hpp"
 #include <thread>
 #include <queue>
+#include <unistd.h>
+#include <termios.h>
+#include <sys/ioctl.h>
+
 
 
 #ifdef _WIN32
@@ -13,6 +17,9 @@
 #endif
 
 
+#define RX_BUFF_SIZE 1024
+#define TX_BUFF_SIZE 1024
+
 namespace transport
 {
 	class UartTransport : public ITransport {
@@ -22,12 +29,11 @@ namespace transport
 
 		ErrorCode open() override;
 		ErrorCode close() override;
-		bool is_open() const override;
 
 		int send(const Byte* data, size_t length) override;
 		int receive(Byte* buffer, size_t length, uint32_t timeout_ms) override;
 
-		size_t available() const override;
+		int available() const override;
 		ErrorCode flush() override;
 
 		SerialConfig get_config() const override 
@@ -36,9 +42,22 @@ namespace transport
 		};
 
 	private: 
+		void startReciveThread()
+		{
+			m_thread = std::thread(&UartTransport::reciveThread, this);
+		};
+
+		void reciveThread();
+
+	private: 
 		std::thread m_async_thread;
 		std::queue<ByteBuffer> m_rx_queue;
 
+		uint16_t thread_timeout = 1000;
+		std::thread m_thread;
+
+		Byte rx_buff[RX_BUFF_SIZE] = {0};
+		Byte tx_buff[TX_BUFF_SIZE] = {0};
 
 #ifdef _WIN32
 		HANDLE m_handle;
