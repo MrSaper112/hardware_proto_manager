@@ -50,7 +50,7 @@ int main()
 	while (1)
 	{
 		// uart_transport.send(reinterpret_cast<const transport::Byte*>(mes.data()), mes.length());
-		uart_transport.sendMessage(&test_mes);
+		// uart_transport.sendMessage(&test_mes);
 
 		this_thread::sleep_for(chrono::milliseconds(2000));
 	}

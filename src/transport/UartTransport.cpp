@@ -44,7 +44,7 @@ ErrorCode UartTransport::open()
 
 	try
 	{
-		// this->startReciveThread();
+		this->startReciveThread();
 	}
 	catch (std::exception ex)
 	{
@@ -56,43 +56,73 @@ ErrorCode UartTransport::open()
 void UartTransport::receiveThread()
 {
 	int bytes_count = 0;
-
+	std::cout << "Starting main recive thread" << std::endl;
 	while (is_open())
 	{
 		bytes_count = this->available();
-		if (bytes_count > 0)
+		if (bytes_count <= 0)
 		{
-			try
-			{
-				memset(&rx_buff, 0, RX_BUFF_SIZE);
-
-				if (this->receive(rx_buff, bytes_count, 100) < 0)
-				{
-					std::cout << "Invalid read" << std::endl;
-					continue;
-				};
-
-				std::cout << "Recived: ";
-				// if (rx_buff[0] == START_BYTE && rx_buff[bytes_count + 1] == END_BYTE)
-				// {
-				// 	for (size_t i = 0; i < bytes_count; i++)
-				// 	{
-				// 		std::cout << rx_buff[i];
-				// 	}
-				// 	std::cout << std::endl;
-
-				// 	Byte ack = {};
-				// 	snprintf(&ack, 1, "%x", ACK_BYTE);
-				// 	this->send(&ack, 1);
-				// }
-			}
-			catch (const std::exception ex)
-			{
-				std::cout << ex.what() << std::endl;
-			};
-
-			usleep(thread_timeout * 1);
+			continue;
 		}
+
+		size_t bytes_read = this->receive(rx_buff, 1, 100);
+		if (bytes_read != 1)
+		{
+			std::cout << "Failed to read length byte" << std::endl;
+			continue;
+		}
+
+		uint8_t expected_len = rx_buff[0];
+		if (expected_len == 0 || expected_len > (RX_BUFF_SIZE - 1))
+		{
+			std::cout << "Invalid length: " << static_cast<int>(expected_len) << std::endl;
+			continue;
+		}
+
+		auto start_time = std::chrono::steady_clock::now();
+		while (this->available() < expected_len)
+		{
+			auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start_time).count();
+
+			if (elapsed > 1000)
+			{
+				std::cout << "Timeout waiting for data. Expected: " << static_cast<int>(expected_len) << ", Available: " << this->available() << std::endl;
+				break;
+			}
+
+			usleep(thread_timeout * 10);
+		}
+
+		bytes_read = this->receive(rx_buff + 1, this->available(), 100);
+		if (bytes_read != expected_len)
+		{
+			std::cout << "Failed to read complete message. Expected: " << static_cast<int>(expected_len) << ", Got: " << bytes_read << std::endl;
+			continue;
+		}
+
+		size_t total_bytes = 1 + expected_len;
+
+		try
+		{
+			Message mes = Message::deserialize(rx_buff, total_bytes);
+			mesRecieveQue.push_back(mes);
+			
+			std::cout << "Message received successfully!" << std::endl;
+			std::cout << "idx: 0x" << std::hex << mes.idx << std::dec << std::endl;
+			std::cout << "data size: " << mes.data.size() << std::endl;
+
+			std::cout << "data (hex): ";
+			for (const auto &byte : mes.data)
+			{
+				printf("%02X ", static_cast<uint8_t>(byte));
+			}
+			std::cout << std::endl;
+		}
+		catch (const std::exception &ex)
+		{
+			std::cout << "Exception: " << ex.what() << std::endl;
+		}
+		memset(rx_buff, 0, RX_BUFF_SIZE);
 	};
 };
 
@@ -101,7 +131,7 @@ ErrorCode UartTransport::close()
 	return ErrorCode::Success;
 }
 
-int UartTransport::sendMessage(const Message* mes)
+int UartTransport::sendMessage(const Message *mes)
 {
 	auto serialized = mes->serialize();
 

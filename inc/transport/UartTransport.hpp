@@ -61,6 +61,8 @@ namespace transport
 		Byte rx_buff[RX_BUFF_SIZE] = {0};
 		Byte tx_buff[TX_BUFF_SIZE] = {0};
 
+		std::vector<Message> mesRecieveQue;
+
 #ifdef _WIN32
 		HANDLE m_handle;
 		ErrorCode configure_windows();
