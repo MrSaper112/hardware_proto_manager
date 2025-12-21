@@ -73,18 +73,18 @@ void UartTransport::receiveThread()
 				};
 
 				std::cout << "Recived: ";
-				if (rx_buff[0] == START_BYTE && rx_buff[bytes_count + 1] == END_BYTE)
-				{
-					for (size_t i = 0; i < bytes_count; i++)
-					{
-						std::cout << rx_buff[i];
-					}
-					std::cout << std::endl;
+				// if (rx_buff[0] == START_BYTE && rx_buff[bytes_count + 1] == END_BYTE)
+				// {
+				// 	for (size_t i = 0; i < bytes_count; i++)
+				// 	{
+				// 		std::cout << rx_buff[i];
+				// 	}
+				// 	std::cout << std::endl;
 
-					Byte ack = {};
-					snprintf(&ack, 1, "%x", ACK_BYTE);
-					this->send(&ack, 1);
-				}
+				// 	Byte ack = {};
+				// 	snprintf(&ack, 1, "%x", ACK_BYTE);
+				// 	this->send(&ack, 1);
+				// }
 			}
 			catch (const std::exception ex)
 			{
@@ -103,14 +103,10 @@ ErrorCode UartTransport::close()
 
 int UartTransport::sendMessage(const Message* mes)
 {
-	Byte start_seq = static_cast<Byte>(START_BYTE);
-	this->send(&start_seq, 1);
-
 	auto serialized = mes->serialize();
-	this->send(serialized.data(), serialized.size());
 
-	Byte end_seq = static_cast<Byte>(END_BYTE);
-	this->send(&end_seq, 1);
+	int status = this->send(serialized.data(), serialized.size());
+
 	return 0;
 }
 

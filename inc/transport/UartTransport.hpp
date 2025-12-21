@@ -20,9 +20,6 @@
 #define RX_BUFF_SIZE 	 1024
 #define TX_BUFF_SIZE 	 1024
 
-#define START_BYTE 		 0x01
-#define END_BYTE 		 0x17
-#define ACK_BYTE         0x06
 
 namespace transport
 {

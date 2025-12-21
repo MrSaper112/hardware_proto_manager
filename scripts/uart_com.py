@@ -1,56 +1,65 @@
 import time
 import serial
-import random
+from dataclasses import dataclass
 
 COM_PORT = "/tmp/tty20"
 BAUDRATE = 115200
 
-serial_con = None
+@dataclass
+class Message:
+    length: int
+    idx: int
+    data: bytes
 
-def connect_to_serial():
-    global serial_con
-    
-    if serial_con is not None: 
-        raise Exception("Serial port opened")
-    
-    serial_con = serial.Serial(COM_PORT, BAUDRATE)
-    
-    serial_con.write("BUFF".encode("ASCII"))
+def read_message(ser):
+    """Read one complete message from serial port"""
+    try:
+        length_byte = ser. read(1)
+        if len(length_byte) == 0:
+            return None
+            
+        length = length_byte[0]
+        
+        remaining = ser.read(length)
+        if len(remaining) < length:
+            print(f"Warning: Expected {length} bytes, got {len(remaining)}")
+            return None
+        
+        idx = (remaining[0] << 24) | \
+              (remaining[1] << 16) | \
+              (remaining[2] << 8) | \
+              (remaining[3] << 0)
+        
+        data = remaining[4:]
+        
+        return Message(length=length, idx=idx, data=data)
+        
+    except Exception as e: 
+        print(f"Error reading message: {e}")
+        return None
 
-    counter = 0
-    mes = ""
-    data = []
-    while serial_con.is_open: 
-        while serial_con.inWaiting():
-            ddmes = serial_con.read(1)
-            if ddmes.hex() == '01':
-                data = []
-                
-            if ddmes.hex() == '17':
-                break
-                            
-            if ddmes.hex() == "06":
-                print('ack')
-                
-            data.append(ddmes)
-            time.sleep(0.001)
-            
-        if len(data) > 0:
-            print(", ".join([f"0x{dat.hex()}" for dat in data]))
-            print("".join([dat.decode("ASCII") for dat in data]))
-            data = []
-            
-            
-        time.sleep(0.1)
+def main():
+    with serial.Serial(COM_PORT, BAUDRATE, timeout=1.0) as ser:
+        ser.write(b"BUFF")
+        print("Connected to serial port")
+        
+        try:
+            while True:
+                msg = read_message(ser)
+                if msg is not None:
+                    print(f"Length: {msg.length}")
+                    print(f"IDX: 0x{msg. idx:08X} ({msg.idx})")
+                    print(f"Data (hex): {' '.join([f'{b:02X}' for b in msg. data])}")
+                    try:
+                        print(f"Data (ASCII): {msg.data.decode('ascii')}")
+                    except: 
+                        print(f"Data (ASCII): <binary data>")
+                    print("-" * 50)
+                else:
+                    time.sleep(0.01)
+                    
+        except KeyboardInterrupt:
+            print("\nExiting...")
 
-            
-        # counter+=1 
-        if counter % 20 == 1:
-            ran = str(random.randint(1, 69) * random.randint(1,4)).encode("ASCII")
-            print(f"Sending {ran}")
-            serial_con.write(ran)
-            
 if __name__ == "__main__":
-    serial_con = None
-    
-    connect_to_serial()
+    main()

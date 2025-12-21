@@ -7,13 +7,19 @@
 
 struct Message
 {
-    uint8_t idx;
+    uint8_t len;
+    uint32_t idx;
     std::vector<char> data; 
 
     std::vector<transport::Byte> serialize() const {
         std::vector<transport::Byte> buffer;
-        buffer.push_back(idx);
-        buffer.push_back(static_cast<transport::Byte>(data.size()));
+        buffer.push_back(static_cast<transport::Byte>(data.size()) + sizeof(uint32_t));
+
+        buffer.push_back((idx >> 24) & 0xFF);
+        buffer.push_back((idx >> 16) & 0xFF);
+        buffer.push_back((idx >> 8) & 0xFF);
+        buffer.push_back((idx >> 0) & 0xFF);
+
         buffer.insert(buffer.end(), data.begin(), data.end());
         return buffer;
     }
