@@ -1,3 +1,4 @@
+from enum import IntEnum
 import time
 import serial
 from dataclasses import dataclass
@@ -8,9 +9,20 @@ BAUDRATE = 115200
 
 serial_con = None
 
+class MessageType(IntEnum):
+    NONE = 0
+    TEXT = 1 
+    CONFIG = 2
+    SENSOR_DATA = 3
+    NOTIFICATION = 4
+    ERROR = 5
+
+    UNDEFINED = 255
+
 @dataclass
 class Message:
     idx: int
+    mesType: MessageType
     data: bytes
     
     def __str__(self):
@@ -19,16 +31,17 @@ class Message:
             data_ascii = self.data.decode('ascii', errors='replace')
         except:
             data_ascii = "<binary>"
-        return f"Message(idx=0x{self.idx:08X}, data=[{data_hex}] '{data_ascii}')"
+        return f"Message(idx=0x{self.idx:08X}, message_type=[{str(self.mesType)}] data=[{data_hex}] '{data_ascii}')"
     
     def serialize(self) -> bytes:
         """Serialize message to bytes matching C++ format"""
-        length = 4 + len(self.data)
+        length = 5 + len(self.data)
         
         buffer = bytearray()
-        
         buffer.append(length & 0xFF)
         
+        buffer.append(self.mesType & 0xFF)
+
         buffer.append((self.idx >> 24) & 0xFF)
         buffer.append((self.idx >> 16) & 0xFF)
         buffer.append((self.idx >> 8) & 0xFF)
@@ -43,17 +56,19 @@ class Message:
         """Deserialize bytes to Message"""
         if len(buffer) < 5:
             return None
+        offset = 0
         
-        length = buffer[0]
+        length = buffer[offset]
+        mesType = MessageType(buffer[++offset])
         
-        idx = (buffer[1] << 24) | \
-              (buffer[2] << 16) | \
-              (buffer[3] << 8) | \
-              (buffer[4] << 0)
+        idx = (buffer[++offset] << 24) | \
+              (buffer[++offset] << 16) | \
+              (buffer[++offset] << 8) | \
+              (buffer[++offset] << 0)
         
-        data = buffer[5:]
+        data = buffer[++offset:]
         
-        return Message(idx=idx, data=data)
+        return Message(idx=idx, mesType=mesType, data=data)
 
 
 class MessageReceiver:
@@ -89,9 +104,9 @@ class MessageReceiver:
         self.expected_length = 0
 
 
-def send_message(ser: serial.Serial, idx: int, data: bytes):
+def send_message(ser: serial.Serial, idx: int, message_type: MessageType, data: bytes):
     """Send a message over serial port"""
-    msg = Message(idx=idx, data=data)
+    msg = Message(idx=idx, mesType=message_type, data=data)
     serialized = msg.serialize()
     
     print(f"Sending:  {msg}")
@@ -101,14 +116,14 @@ def send_message(ser: serial.Serial, idx: int, data: bytes):
     ser.flush()
 
 
-def send_string(ser: serial.Serial, idx: int, text: str):
+def send_string(ser: serial.Serial, idx: int, message_type: MessageType, text: str):
     """Send a string message"""
-    send_message(ser, idx, text.encode('ascii'))
+    send_message(ser, idx, message_type, text.encode('ascii'))
 
 
-def send_binary(ser: serial.Serial, idx: int, data: List[int]):
+def send_binary(ser: serial.Serial, idx: int, message_type: MessageType,  data: List[int]):
     """Send binary data"""
-    send_message(ser, idx, bytes(data))
+    send_message(ser, idx, message_type, bytes(data))
 
 
 def connect_to_serial():
@@ -164,8 +179,8 @@ def interactive_mode():
     serial_con = serial.Serial(COM_PORT, BAUDRATE, timeout=0.1)
     print("Connected to serial port")
     print("Commands:")
-    print("  send <idx> <text>     - Send text message")
-    print("  binary <idx> <bytes>  - Send binary (e.g., binary 123 01,02,FF)")
+    print("  send <idx> <message_type> <text>     - Send text message (e.g. send 1 1 ABCD)")
+    print("  binary <idx> <message_type> <bytes>  - Send binary (e.g., binary 123 1 01,02,FF)")
     print("  quit                  - Exit")
     print()
     
@@ -196,21 +211,23 @@ def interactive_mode():
                 if not user_input:
                     continue
                     
-                parts = user_input.split(maxsplit=2)
+                parts = user_input.split(maxsplit=3)
                 
                 if parts[0] == "quit":
                     break
                     
-                elif parts[0] == "send" and len(parts) >= 3:
+                elif parts[0] == "send" and len(parts) >= 4:
                     idx = int(parts[1], 0)
-                    text = parts[2]
-                    send_string(serial_con, idx, text)
+                    text = parts[3]
+                    message_type = MessageType(int(parts[2], 0))
+                    send_string(serial_con, idx, message_type, text)
                     
-                elif parts[0] == "binary" and len(parts) >= 3:
+                elif parts[0] == "binary" and len(parts) >= 4:
                     idx = int(parts[1], 0)
-                    byte_strs = parts[2]. split(',')
+                    byte_strs = parts[3]. split(',')
+                    message_type = MessageType(int(parts[2], 0))
                     data = [int(b. strip(), 16) for b in byte_strs]
-                    send_binary(serial_con, idx, data)
+                    send_binary(serial_con, idx, message_type, data)
                     
                 else:
                     print("Unknown command")

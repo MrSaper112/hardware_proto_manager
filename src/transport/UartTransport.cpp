@@ -106,17 +106,7 @@ void UartTransport::receiveThread()
 		{
 			Message mes = Message::deserialize(rx_buff, total_bytes);
 			mesRecieveQue.push_back(mes);
-			
-			std::cout << "Message received successfully!" << std::endl;
-			std::cout << "idx: 0x" << std::hex << mes.idx << std::dec << std::endl;
-			std::cout << "data size: " << mes.data.size() << std::endl;
-
-			std::cout << "data (hex): ";
-			for (const auto &byte : mes.data)
-			{
-				printf("%02X ", static_cast<uint8_t>(byte));
-			}
-			std::cout << std::endl;
+			mes.print();
 		}
 		catch (const std::exception &ex)
 		{
