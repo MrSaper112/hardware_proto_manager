@@ -6,6 +6,12 @@
 
 namespace protoc
 {
+	template <typename PayloadType>
+	struct Packet
+	{
+		
+	};
+
 	class IProtocolAdapter
 	{
 	public:
