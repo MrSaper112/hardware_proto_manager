@@ -11,7 +11,6 @@ namespace protoc
 		PlainProtocol() = default;
 		~PlainProtocol() override;
 
-		VectorChar encodeData(const VectorChar &mes);
-		VectorChar decodeData(const VectorChar &mes);
+
 	};
 }

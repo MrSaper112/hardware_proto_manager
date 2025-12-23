@@ -16,6 +16,11 @@ struct Message
 
     Message() : len(0), idx(0), mesType(MessageType::Undefined) {};
 
+    Message(uint32_t index, MessageType type): idx(index), mesType(type)
+    {
+        this->len = static_cast<uint8_t>(sizeof(idx) + sizeof(mesType));
+    }
+
     Message(uint32_t index, MessageType type, const VectorChar &payload) : idx(index), mesType(type), data(payload)
     {
         this->len = static_cast<uint8_t>(sizeof(idx) + sizeof(mesType) + data.size());
@@ -106,12 +111,19 @@ struct Message
         printf("\n");
     }
 
-    std::string getDataAsString() const {
+    std::string getDataAsString() const
+    {
         return std::string(data.begin(), data.end());
     }
 
-    void setData(const std::string& str) {
+    void setData(const std::string &str)
+    {
         data.assign(str.begin(), str.end());
         len = static_cast<uint8_t>(sizeof(mesType) + sizeof(idx) + data.size());
+    }
+
+    bool operator==(const Message &mes)
+    {
+        return this->idx == mes.idx && this->len == mes.len;
     }
 };
