@@ -10,6 +10,8 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
     message(FATAL_ERROR "In-source builds are not allowed. Please use a separate build directory.")
 endif()
 
+add_subdirectory(external/nlohmann_json)
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_CXX_FLAGS "" CACHE STRING "" FORCE)
@@ -41,6 +43,11 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/inc
 )
 
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        nlohmann_json::nlohmann_json
+)
+
 if(MSVC)
     target_compile_options(${PROJECT_NAME}
         PRIVATE
@@ -54,7 +61,7 @@ if(MSVC)
 else()
     target_compile_options(${PROJECT_NAME}
         PRIVATE
-            -Wall -Wextra -Wpedantic
+            -Wall -Wextra
             -O3
     )
 endif()

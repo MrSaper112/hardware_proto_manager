@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <termios.h>
 #include <sys/ioctl.h>
-
+#include "messages/Message.hpp"
 
 
 #ifdef _WIN32
@@ -17,8 +17,9 @@
 #endif
 
 
-#define RX_BUFF_SIZE 1024
-#define TX_BUFF_SIZE 1024
+#define RX_BUFF_SIZE 	 1024
+#define TX_BUFF_SIZE 	 1024
+
 
 namespace transport
 {
@@ -30,9 +31,8 @@ namespace transport
 		ErrorCode open() override;
 		ErrorCode close() override;
 
-		int send(const Byte* data, size_t length) override;
-		int receive(Byte* buffer, size_t length, uint32_t timeout_ms) override;
-
+	public:
+		int sendMessage(const Message* mes);
 		int available() const override;
 		ErrorCode flush() override;
 
@@ -41,6 +41,9 @@ namespace transport
 			return m_config;
 		};
 
+
+		int send(const Byte* data, size_t length) override;
+		int receive(Byte* buffer, size_t length, uint32_t timeout_ms) override;
 	private: 
 		void startReciveThread()
 		{
@@ -57,6 +60,8 @@ namespace transport
 
 		Byte rx_buff[RX_BUFF_SIZE] = {0};
 		Byte tx_buff[TX_BUFF_SIZE] = {0};
+
+		std::vector<Message> mesRecieveQue;
 
 #ifdef _WIN32
 		HANDLE m_handle;
