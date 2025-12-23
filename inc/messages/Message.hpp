@@ -39,12 +39,14 @@ constexpr const char* messageTypeToString(MessageType type) noexcept {
     }
 }
 
+using VectorChar = std::vector<char>;
+
 struct Message
 {
     uint8_t len;
     uint32_t idx;
     MessageType mesType;
-    std::vector<char> data; 
+    VectorChar data; 
 
     std::vector<transport::Byte> serialize() const {
         std::vector<transport::Byte> buffer;

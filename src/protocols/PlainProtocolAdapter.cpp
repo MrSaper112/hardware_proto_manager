@@ -1,2 +1,0 @@
-#include "protocols/PlainProtocolAdapter.hpp"
-

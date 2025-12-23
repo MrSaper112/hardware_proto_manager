@@ -12,8 +12,10 @@ namespace protoc
 		IProtocolAdapter() = default;
 		virtual ~IProtocolAdapter() = default;
 
-		virtual void encodeData(const char *data, size_t size) = 0;
-		virtual void decodeData(const char *data, size_t size) = 0;
+		virtual VectorChar encodeData(const VectorChar &data) = 0;
+		virtual VectorChar decodeData(const VectorChar &data) = 0;
 
+		virtual VectorChar encodeString(const std::string &mes) = 0;
+		virtual VectorChar decodeString(const std::string &mes) = 0;
 	};
 }
