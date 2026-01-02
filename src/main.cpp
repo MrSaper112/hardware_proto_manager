@@ -44,12 +44,11 @@ int main()
 
 
 	// std::string mes = "Hello UART\n";
-	// uart_transport.send(reinterpret_cast<const char*>(mes.data()), mes.length());
+	// uart_transport.sendMessage(&test_mes);
 
 	while (1)
 	{
-		// uart_transport.send(reinterpret_cast<const char*>(mes.data()), mes.length());
-		// uart_transport.sendMessage(&test_mes);
+		uart_transport.sendMessage(&test_mes);
 
 		this_thread::sleep_for(chrono::milliseconds(2000));
 	}

@@ -10,14 +10,13 @@ BAUDRATE = 115200
 serial_con = None
 
 class MessageType(IntEnum):
-    NONE = 0
-    TEXT = 1 
-    CONFIG = 2
-    SENSOR_DATA = 3
-    NOTIFICATION = 4
-    ERROR = 5
-
-    UNDEFINED = 255
+    NONE = 0x00,
+    COMMAND = 0x01,
+    RESPONSE = 0x02,
+    DATA = 0x03,
+    HEARTBEAT = 0x04,
+    ERROR = 0x05,
+    Undefined = 0xFF
 
 @dataclass
 class Message:
@@ -108,7 +107,9 @@ def send_message(ser: serial.Serial, idx: int, message_type: MessageType, data: 
     """Send a message over serial port"""
     msg = Message(idx=idx, mesType=message_type, data=data)
     serialized = msg.serialize()
-    
+
+    print(f"\n=== Sending Message ===")
+    print(f"Len: {serialized[0]} bytes")
     print(f"Sending:  {msg}")
     print(f"Raw bytes: {' '.join([f'{b:02X}' for b in serialized])}")
     
@@ -133,21 +134,37 @@ def connect_to_serial():
         raise Exception("Serial port already opened")
     
     serial_con = serial.Serial(COM_PORT, BAUDRATE, timeout=0.1)
-    
-    serial_con.write("BUFF".encode("ASCII"))
     print("Connected and sent BUFF command\n")
     
     receiver = MessageReceiver()
     
     print("=== Sending Test Messages ===")
-    send_string(serial_con, 0x12345678, "Hello")
+    send_string(serial_con, 0x12345678, MessageType.COMMAND, "Hello")
     time.sleep(0.1)
     
-    send_string(serial_con, 0xABCDEF01, "World!")
+    send_string(serial_con, 0xABCDEF01, MessageType.COMMAND, "Maja!")
     time.sleep(0.1)
     
-    send_binary(serial_con, 0x00000042, [0x01, 0x02, 0x03, 0xFF])
-    time.sleep(0.1)
+    import threading
+        
+    def receive_loop():
+        while serial_con and serial_con.is_open:
+            if serial_con.in_waiting > 0:
+                byte_data = serial_con.read(1)
+                if len(byte_data) > 0:
+                    message = receiver.process_byte(byte_data[0])
+                    if message is not None:
+                        print(f"\n← Received: {message}")
+                        # print("> ", end='', flush=True)
+            else:
+                time.sleep(0.01)
+        
+    recv_thread = threading.Thread(target=receive_loop, daemon=True)
+    recv_thread.start()
+
+    while True:
+        send_binary(serial_con, 0x00000042, MessageType.DATA, [0x01, 0x02, 0x03, 0xFF])
+        time.sleep(1)
     
     print("\n=== Listening for Messages ===")
     

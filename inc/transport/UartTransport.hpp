@@ -52,7 +52,7 @@ namespace transport
 	private: 
 		std::queue<ByteBuffer> m_rx_queue;
 
-		uint16_t thread_timeout = 1000;
+		uint16_t thread_timeout = 1;
 		std::thread m_thread;
 
 		char rx_buff[RX_BUFF_SIZE] = {0};

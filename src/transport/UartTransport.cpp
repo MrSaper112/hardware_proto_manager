@@ -2,6 +2,7 @@
 #include <iostream>
 #include <asm-generic/ioctls.h>
 #include <cstring>
+#include <thread>
 
 using namespace transport;
 
@@ -151,6 +152,7 @@ int UartTransport::send(const char *data, size_t length)
 	{
 		throw PortException("Failed to write to port", ErrorCode::OperationFailed);
 	}
+	std::cout << "Written bytes: " << bytes_written << std::endl;
 	return bytes_written;
 #endif
 }
