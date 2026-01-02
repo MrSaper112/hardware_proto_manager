@@ -14,8 +14,7 @@
 #endif
 
 namespace transport {
-    using Byte = char;
-    using ByteBuffer = std::vector<Byte>;
+    using ByteBuffer = std::vector<char>;
     using PortName = std::string;
     using Timestamp = uint64_t;
 

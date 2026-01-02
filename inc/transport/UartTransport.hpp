@@ -39,8 +39,8 @@ namespace transport
 		};
 
 
-		int send(const Byte* data, size_t length) override;
-		int receive(Byte* buffer, size_t length) override;
+		int send(const char* data, size_t length) override;
+		int receive(char* buffer, size_t length) override;
 	private: 
 		void startReciveThread()
 		{
@@ -55,8 +55,8 @@ namespace transport
 		uint16_t thread_timeout = 1000;
 		std::thread m_thread;
 
-		Byte rx_buff[RX_BUFF_SIZE] = {0};
-		Byte tx_buff[TX_BUFF_SIZE] = {0};
+		char rx_buff[RX_BUFF_SIZE] = {0};
+		char tx_buff[TX_BUFF_SIZE] = {0};
 
 		std::vector<Message> mesRecieveQue;
 

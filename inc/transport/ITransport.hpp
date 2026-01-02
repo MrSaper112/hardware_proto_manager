@@ -28,12 +28,12 @@ namespace transport {
 			return m_con_state;
 		};
 
-		virtual int send(const Byte* data, size_t length) = 0;
+		virtual int send(const char* data, size_t length) = 0;
 		virtual int send(const ByteBuffer& data) {
 			return send(data.data(), data.size());
 		}
 
-		virtual int receive(Byte* buffer, size_t length) = 0;
+		virtual int receive(char* buffer, size_t length) = 0;
 
 		virtual ByteBuffer receive(size_t length) {
 			ByteBuffer buffer(length);

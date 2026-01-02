@@ -7,8 +7,9 @@
 #include <stdexcept>
 #include "MessageTypes.hpp"
 
-struct Message
-{
+class Message
+{   
+public:
     uint8_t len;
     uint32_t idx;
     MessageType mesType;
@@ -21,21 +22,16 @@ struct Message
         this->len = static_cast<uint8_t>(sizeof(idx) + sizeof(mesType));
     }
 
-    Message(uint32_t index, MessageType type, const VectorChar &payload) : idx(index), mesType(type), data(payload)
+    template<typename T>
+    Message(uint32_t index, MessageType type, const T& payload) : idx(index), mesType(type), data(payload)
     {
-        this->len = static_cast<uint8_t>(sizeof(idx) + sizeof(mesType) + data.size());
+        this->len = static_cast<uint8_t>(sizeof(idx) + sizeof(mesType) + data.get().size());
     }
 
-    Message(uint32_t index, MessageType type, const std::string &payload) : idx(index), mesType(type)
+    std::vector<char> serialize() const
     {
-        data.assign(payload.begin(), payload.end());
-        this->len = static_cast<uint8_t>(sizeof(idx) + sizeof(mesType) + data.size());
-    }
-
-    std::vector<transport::Byte> serialize() const
-    {
-        std::vector<transport::Byte> buffer;
-        buffer.push_back(static_cast<transport::Byte>(data.size()) + sizeof(idx) + sizeof(mesType));
+        std::vector<char> buffer;
+        buffer.push_back(static_cast<char>(data.get().size()) + sizeof(idx) + sizeof(mesType));
         buffer.push_back(static_cast<uint8_t>(mesType));
 
         buffer.push_back((idx >> 24) & 0xFF);
@@ -43,17 +39,17 @@ struct Message
         buffer.push_back((idx >> 8) & 0xFF);
         buffer.push_back((idx >> 0) & 0xFF);
 
-        buffer.insert(buffer.end(), data.begin(), data.end());
+        buffer.insert(buffer.end(), data.get().begin(), data.get().end());
         return buffer;
     }
 
-    static Message deserialize(const std::vector<transport::Byte> &buffer)
+    static Message deserialize(const std::vector<char> &buffer)
     {
         auto msg = deserialize(buffer.data(), buffer.size());
         return msg;
     }
 
-    static Message deserialize(const transport::Byte *rx_buff, uint8_t buff_len)
+    static Message deserialize(const char *rx_buff, uint8_t buff_len)
     {
         if (buff_len < 5)
         {
@@ -77,7 +73,10 @@ struct Message
 
 
         size_t data_len = msg.len - sizeof(uint32_t);
-        msg.data.assign(rx_buff + 6, rx_buff + 6 + data_len);
+
+        std::vector<char> vec;
+        vec.assign(rx_buff + 6, rx_buff + 6 + data_len);
+        msg.data = VectorChar(vec);
 
         return msg;
     };
@@ -88,13 +87,13 @@ struct Message
         printf("  len: %u\n", len);
         printf("  idx:  0x%08X (%u)\n", idx, idx);
         printf("  message_type:  0x%08X (%u-%s)\n", static_cast<uint8_t>(mesType), static_cast<uint8_t>(mesType), messageTypeToString(mesType));
-        printf("  data (%zu bytes): ", data.size());
-        for (auto c : data)
+        printf("  data (%zu bytes): ", data.get().size());
+        for (auto c : data.get())
         {
             printf("%02X ", static_cast<uint8_t>(c));
         }
         printf("\n  data (ASCII): ");
-        for (auto c : data)
+        for (auto c : data.get())
         {
             if (c >= 32 && c <= 126)
             {
@@ -106,17 +105,6 @@ struct Message
             }
         }
         printf("\n");
-    }
-
-    std::string getDataAsString() const
-    {
-        return std::string(data.begin(), data.end());
-    }
-
-    void setData(const std::string &str)
-    {
-        data.assign(str.begin(), str.end());
-        len = static_cast<uint8_t>(sizeof(mesType) + sizeof(idx) + data.size());
     }
 
     bool operator==(const Message &mes)

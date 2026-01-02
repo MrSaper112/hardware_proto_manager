@@ -129,7 +129,7 @@ int UartTransport::sendMessage(const Message *mes)
 	return status;
 }
 
-int UartTransport::send(const Byte *data, size_t length)
+int UartTransport::send(const char *data, size_t length)
 {
 	if (!is_open())
 	{
@@ -155,7 +155,7 @@ int UartTransport::send(const Byte *data, size_t length)
 #endif
 }
 
-int UartTransport::receive(Byte *buffer, size_t length)
+int UartTransport::receive(char *buffer, size_t length)
 {
 	return read(m_fd, buffer, length);
 }

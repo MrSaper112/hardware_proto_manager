@@ -2,6 +2,8 @@
 
 #include <cstdint>
 #include <vector>
+#include <string>
+#include <cstring>
 
 enum class MessageType : uint8_t
 {
@@ -48,4 +50,51 @@ constexpr const char *messageTypeToString(MessageType type) noexcept
     }
 }
 
-using VectorChar = std::vector<char>;
+class VectorChar
+{
+public:
+    VectorChar() = default;
+
+    VectorChar(const char *str)
+        : m_data(str, str + std::strlen(str))
+    {
+    }
+
+    VectorChar(const std::string &str)
+        : m_data(str.begin(), str.end())
+    {
+    }
+
+    VectorChar(uint8_t value)
+        : m_data{static_cast<char>(value)}
+    {
+    }
+
+    VectorChar(char value)
+        : m_data{value}
+    {
+    }
+
+    VectorChar(std::vector<char> &data)
+        : m_data(data)
+    {
+    }
+
+    VectorChar(const std::vector<uint8_t> &data)
+    {
+        m_data.reserve(data.size());
+        for (uint8_t byte : data)
+        {
+            m_data.push_back(static_cast<char>(byte));
+        }
+    }
+
+    template <typename T>
+    VectorChar(const T &) = delete;
+
+    std::vector<char> &&move() { return std::move(m_data); }
+    std::vector<char>& get() { return m_data; }
+    const std::vector<char>& get() const { return m_data; }
+protected:
+    std::vector<char> m_data;
+};

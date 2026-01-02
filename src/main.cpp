@@ -21,14 +21,11 @@ int main()
 
 	auto uart_transport = UartTransport(config);
 	
+	std::vector<uint8_t> data = {65, 66, 67, 68};
+
 	Message test_mes = {};
 	test_mes.mesType = MessageType::Data;
 	test_mes.idx = 0x12345678;
-
-	test_mes.data.push_back(65);
-	test_mes.data.push_back(66);
-	test_mes.data.push_back(67);
-	test_mes.data.push_back(68);
 
 	auto parsed = test_mes.serialize();
 
@@ -47,11 +44,11 @@ int main()
 
 
 	// std::string mes = "Hello UART\n";
-	// uart_transport.send(reinterpret_cast<const transport::Byte*>(mes.data()), mes.length());
+	// uart_transport.send(reinterpret_cast<const char*>(mes.data()), mes.length());
 
 	while (1)
 	{
-		// uart_transport.send(reinterpret_cast<const transport::Byte*>(mes.data()), mes.length());
+		// uart_transport.send(reinterpret_cast<const char*>(mes.data()), mes.length());
 		// uart_transport.sendMessage(&test_mes);
 
 		this_thread::sleep_for(chrono::milliseconds(2000));
