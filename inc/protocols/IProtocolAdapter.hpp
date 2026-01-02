@@ -24,6 +24,7 @@ namespace protoc
 		virtual Message decode(const VectorChar &data)
 		{
 			this->decode(&data.at(0), data.size());
+			return Message();
 		};
 
 		Message createCommand(const std::string &cmd);

@@ -46,7 +46,7 @@ ErrorCode UartTransport::open()
 	{
 		this->startReciveThread();
 	}
-	catch (std::exception ex)
+	catch (const std::exception ex)
 	{
 		std::cout << ex.what() << std::endl;
 	}
@@ -65,7 +65,7 @@ void UartTransport::receiveThread()
 			continue;
 		}
 
-		size_t bytes_read = this->receive(rx_buff, 1, 100);
+		size_t bytes_read = this->receive(rx_buff, 1);
 		if (bytes_read != 1)
 		{
 			std::cout << "Failed to read length byte" << std::endl;
@@ -93,7 +93,7 @@ void UartTransport::receiveThread()
 			usleep(thread_timeout * 10);
 		}
 
-		bytes_read = this->receive(rx_buff + 1, this->available(), 100);
+		bytes_read = this->receive(rx_buff + 1, this->available());
 		if (bytes_read != expected_len)
 		{
 			std::cout << "Failed to read complete message. Expected: " << static_cast<int>(expected_len) << ", Got: " << bytes_read << std::endl;
@@ -126,8 +126,7 @@ int UartTransport::sendMessage(const Message *mes)
 	auto serialized = mes->serialize();
 
 	int status = this->send(serialized.data(), serialized.size());
-
-	return 0;
+	return status;
 }
 
 int UartTransport::send(const Byte *data, size_t length)
@@ -156,7 +155,7 @@ int UartTransport::send(const Byte *data, size_t length)
 #endif
 }
 
-int UartTransport::receive(Byte *buffer, size_t length, uint32_t timeout_ms)
+int UartTransport::receive(Byte *buffer, size_t length)
 {
 	return read(m_fd, buffer, length);
 }
@@ -219,7 +218,7 @@ ErrorCode transport::UartTransport::configure_unix()
 	options.c_oflag &= ~OPOST;
 
 	options.c_cc[VMIN] = 0;
-	options.c_cc[VTIME] = 1000;
+	options.c_cc[VTIME] = 100;
 
 	if (tcsetattr(m_fd, TCSANOW, &options) != 0)
 	{

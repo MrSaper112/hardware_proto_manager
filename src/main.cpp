@@ -5,6 +5,9 @@
 using namespace transport;
 using namespace std;
 
+#define __unix__ 1
+#define _WIN32 0
+
 int main()
 {
 	cout << "Hello CMake." << endl;
@@ -18,9 +21,9 @@ int main()
 
 	auto uart_transport = UartTransport(config);
 	
-	Message test_mes = {
-		.idx = 1
-	};
+	Message test_mes = {};
+	test_mes.mesType = MessageType::Data;
+	test_mes.idx = 0x12345678;
 
 	test_mes.data.push_back(65);
 	test_mes.data.push_back(66);

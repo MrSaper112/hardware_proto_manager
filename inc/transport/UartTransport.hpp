@@ -3,17 +3,14 @@
 #include "ITransport.hpp"
 #include <thread>
 #include <queue>
-#include <unistd.h>
-#include <termios.h>
-#include <sys/ioctl.h>
 #include "messages/Message.hpp"
-
 
 #ifdef _WIN32
 	#include <windows.h>
 #elif __unix__
 	#include <termios.h>
 	#include <unistd.h>
+	#include <sys/ioctl.h>
 #endif
 
 
@@ -43,7 +40,7 @@ namespace transport
 
 
 		int send(const Byte* data, size_t length) override;
-		int receive(Byte* buffer, size_t length, uint32_t timeout_ms) override;
+		int receive(Byte* buffer, size_t length) override;
 	private: 
 		void startReciveThread()
 		{

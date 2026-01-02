@@ -53,34 +53,31 @@ struct Message
         return msg;
     }
 
-    static Message deserialize(const transport::Byte *rx_buff, size_t buff_len)
+    static Message deserialize(const transport::Byte *rx_buff, uint8_t buff_len)
     {
         if (buff_len < 5)
         {
             throw std::runtime_error("Buffer too small:  need at least 5 bytes");
         }
-        uint8_t offset = 0;
-
         Message msg;
 
-        msg.len = rx_buff[offset];
+        msg.len = rx_buff[0];
 
         if (buff_len < (1 + msg.len))
         {
             throw std::runtime_error("Incomplete message in buffer");
         }
 
-        msg.mesType = intToMessageType(rx_buff[++offset]);
+        msg.mesType = intToMessageType(rx_buff[1]);
 
-        msg.idx = (static_cast<uint32_t>(rx_buff[++offset]) << 24) |
-                  (static_cast<uint32_t>(rx_buff[++offset]) << 16) |
-                  (static_cast<uint32_t>(rx_buff[++offset]) << 8) |
-                  (static_cast<uint32_t>(rx_buff[++offset]) << 0);
+        msg.idx = (static_cast<uint32_t>(rx_buff[2]) << 24) |
+                  (static_cast<uint32_t>(rx_buff[3]) << 16) |
+                  (static_cast<uint32_t>(rx_buff[4]) << 8) |
+                  (static_cast<uint32_t>(rx_buff[5]) << 0);
 
-        ++offset;
 
         size_t data_len = msg.len - sizeof(uint32_t);
-        msg.data.assign(rx_buff + offset, rx_buff + offset + data_len);
+        msg.data.assign(rx_buff + 6, rx_buff + 6 + data_len);
 
         return msg;
     };
@@ -90,7 +87,7 @@ struct Message
         printf("Message:\n");
         printf("  len: %u\n", len);
         printf("  idx:  0x%08X (%u)\n", idx, idx);
-        printf("  message_type:  0x%08X (%u-%s)\n", mesType, mesType, messageTypeToString(mesType));
+        printf("  message_type:  0x%08X (%u-%s)\n", static_cast<uint8_t>(mesType), static_cast<uint8_t>(mesType), messageTypeToString(mesType));
         printf("  data (%zu bytes): ", data.size());
         for (auto c : data)
         {

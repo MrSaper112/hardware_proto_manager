@@ -33,11 +33,11 @@ namespace transport {
 			return send(data.data(), data.size());
 		}
 
-		virtual int receive(Byte* buffer, size_t length, uint32_t timeout_ms) = 0;
+		virtual int receive(Byte* buffer, size_t length) = 0;
 
-		virtual ByteBuffer receive(size_t length, uint32_t timeout_ms) {
+		virtual ByteBuffer receive(size_t length) {
 			ByteBuffer buffer(length);
-			int bytes_read = receive(buffer.data(), length, timeout_ms);
+			int bytes_read = receive(buffer.data(), length);
 			if (bytes_read > 0) {
 				buffer.resize(bytes_read);
 			}
