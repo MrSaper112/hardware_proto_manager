@@ -2,16 +2,12 @@
 #include <iostream>
 #include <asm-generic/ioctls.h>
 #include <cstring>
+#include <thread>
 
 using namespace transport;
 
 UartTransport::UartTransport(const SerialConfig &config) : ITransport(config)
 {
-#ifdef _WIN32
-	m_handle = INVALID_HANDLE_VALUE;
-#elif __unix__
-	m_fd = -1;
-#endif
 }
 
 UartTransport::~UartTransport()
@@ -28,11 +24,7 @@ ErrorCode UartTransport::open()
 
 	auto status = ErrorCode::Unknown;
 
-#ifdef _WIN32
-	status = configure_windows();
-#elif __unix__
 	status = configure_unix();
-#endif
 
 	if (status != ErrorCode::Success)
 	{
@@ -44,9 +36,9 @@ ErrorCode UartTransport::open()
 
 	try
 	{
-		this->startReciveThread();
+		this->startReceiveThread();
 	}
-	catch (std::exception ex)
+	catch (const std::exception &ex)
 	{
 		std::cout << ex.what() << std::endl;
 	}
@@ -56,49 +48,97 @@ ErrorCode UartTransport::open()
 void UartTransport::receiveThread()
 {
 	int bytes_count = 0;
-
+	std::cout << "Starting main receive thread" << std::endl;
 	while (is_open())
 	{
 		bytes_count = this->available();
-		if (bytes_count > 0)
+		if (bytes_count <= 0)
 		{
-			try
-			{
-				memset(&rx_buff, 0, RX_BUFF_SIZE);
-
-				if (this->receive(rx_buff, bytes_count, 100) < 0)
-				{
-					std::cout << "Invalid read" << std::endl;
-					continue;
-				};
-
-				std::cout << "Recived: ";
-				for (size_t i = 0; i < bytes_count; i++)
-				{
-					std::cout << rx_buff[i];
-				}
-				std::cout << std::endl;
-
-				this->send(rx_buff, bytes_count);
-			}
-			catch (const std::exception ex)
-			{
-				std::cout << ex.what() << std::endl;
-			};
-
-			usleep(thread_timeout * 1);
+			continue;
 		}
 
-		
+		size_t bytes_read = this->receive(rx_buff, 1);
+		if (bytes_read != 1)
+		{
+			std::cout << "Failed to read length byte" << std::endl;
+			continue;
+		}
+
+		uint8_t expected_len = rx_buff[0];
+		if (expected_len == 0 || expected_len > (RX_BUFF_SIZE - 1))
+		{
+			std::cout << "Invalid length: " << static_cast<int>(expected_len) << std::endl;
+			continue;
+		}
+
+		auto start_time = std::chrono::steady_clock::now();
+		while (this->available() < expected_len)
+		{
+			auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start_time).count();
+
+			if (elapsed > 1000)
+			{
+				std::cout << "Timeout waiting for data. Expected: " << static_cast<int>(expected_len) << ", Available: " << this->available() << std::endl;
+				break;
+			}
+
+			usleep(thread_timeout * 10);
+		}
+
+		bytes_read = this->receive(rx_buff + 1, expected_len);
+		if (bytes_read != expected_len)
+		{
+			std::cout << "Failed to read complete message. Expected: " << static_cast<int>(expected_len) << ", Got: " << bytes_read << std::endl;
+			continue;
+		}
+
+		size_t total_bytes = 1 + expected_len;
+
+		try
+		{
+			Message mes = Message::deserialize(rx_buff, total_bytes);
+
+			std::unique_lock<std::mutex> queueLock(mtxReceive);
+			mesReceiveQueue.push_back(mes);
+
+			queueLock.unlock();
+
+			mes.print();
+		}
+		catch (const std::exception &ex)
+		{
+			std::cout << "Exception: " << ex.what() << std::endl;
+		}
+		memset(rx_buff, 0, RX_BUFF_SIZE);
 	};
 };
 
 ErrorCode UartTransport::close()
 {
+    if (!is_open())  
+    {  
+        return ErrorCode::Success;  
+    }  
+
+    if (m_fd >= 0)  
+    {  
+        ::close(m_fd);  
+        m_fd = -1;  
+    }  
+
+	m_con_state = ConnectionState::Closed;
 	return ErrorCode::Success;
 }
 
-int UartTransport::send(const Byte *data, size_t length)
+int UartTransport::sendMessage(const Message *mes)
+{
+	auto serialized = mes->serialize();
+
+	int status = this->send(serialized.data(), serialized.size());
+	return status;
+}
+
+int UartTransport::send(const char *data, size_t length)
 {
 	if (!is_open())
 	{
@@ -110,21 +150,18 @@ int UartTransport::send(const Byte *data, size_t length)
 		return 0;
 	}
 
-#ifdef _WIN32
-
-#else
-	std::cout << "Sending: " << data << std::endl;
+	std::cout << "Sending: " << length << " bytes" << std::endl;
 
 	ssize_t bytes_written = ::write(m_fd, data, length);
 	if (bytes_written < 0)
 	{
 		throw PortException("Failed to write to port", ErrorCode::OperationFailed);
 	}
+	std::cout << "Written bytes: " << bytes_written << std::endl;
 	return bytes_written;
-#endif
 }
 
-int UartTransport::receive(Byte *buffer, size_t length, uint32_t timeout_ms)
+int UartTransport::receive(char *buffer, size_t length)
 {
 	return read(m_fd, buffer, length);
 }
@@ -147,14 +184,6 @@ ErrorCode UartTransport::flush()
 {
 	return ErrorCode::Success;
 }
-
-#ifdef _WIN32
-ErrorCode transport::UartTransport::configure_windows()
-{
-	return ErrorCode::Success;
-}
-
-#elif __unix__
 
 ErrorCode transport::UartTransport::configure_unix()
 {
@@ -187,7 +216,7 @@ ErrorCode transport::UartTransport::configure_unix()
 	options.c_oflag &= ~OPOST;
 
 	options.c_cc[VMIN] = 0;
-	options.c_cc[VTIME] = 1000;
+	options.c_cc[VTIME] = 100;
 
 	if (tcsetattr(m_fd, TCSANOW, &options) != 0)
 	{
@@ -198,5 +227,3 @@ ErrorCode transport::UartTransport::configure_unix()
 
 	return ErrorCode::Success;
 }
-
-#endif
