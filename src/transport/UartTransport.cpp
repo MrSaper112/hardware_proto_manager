@@ -7,13 +7,7 @@
 using namespace transport;
 
 UartTransport::UartTransport(const SerialConfig &config) : ITransport(config)
-{
-#ifdef _WIN32
-	m_handle = INVALID_HANDLE_VALUE;
-#elif __unix__
-	m_fd = -1;
-#endif
-}
+{}
 
 UartTransport::~UartTransport()
 {
@@ -29,11 +23,7 @@ ErrorCode UartTransport::open()
 
 	auto status = ErrorCode::Unknown;
 
-#ifdef _WIN32
-	status = configure_windows();
-#elif __unix__
 	status = configure_unix();
-#endif
 
 	if (status != ErrorCode::Success)
 	{
@@ -142,9 +132,6 @@ int UartTransport::send(const char *data, size_t length)
 		return 0;
 	}
 
-#ifdef _WIN32
-
-#else
 	std::cout << "Sending: " << length << " bytes" << std::endl;
 
 	ssize_t bytes_written = ::write(m_fd, data, length);
@@ -154,7 +141,6 @@ int UartTransport::send(const char *data, size_t length)
 	}
 	std::cout << "Written bytes: " << bytes_written << std::endl;
 	return bytes_written;
-#endif
 }
 
 int UartTransport::receive(char *buffer, size_t length)
@@ -180,14 +166,6 @@ ErrorCode UartTransport::flush()
 {
 	return ErrorCode::Success;
 }
-
-#ifdef _WIN32
-ErrorCode transport::UartTransport::configure_windows()
-{
-	return ErrorCode::Success;
-}
-
-#elif __unix__
 
 ErrorCode transport::UartTransport::configure_unix()
 {
@@ -231,5 +209,3 @@ ErrorCode transport::UartTransport::configure_unix()
 
 	return ErrorCode::Success;
 }
-
-#endif

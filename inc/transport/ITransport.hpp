@@ -3,14 +3,11 @@
 #include <string>
 #include <thread> 
 
-#ifdef _WIN32
-	#include <windows.h>
-#elif __unix__
-	#include <fcntl.h>
-	#include <errno.h>
-	#include <termios.h>
-	#include <unistd.h>
-#endif
+
+#include <fcntl.h>
+#include <errno.h>
+#include <termios.h>
+#include <unistd.h>
 
 #include "TransportTypes.hpp"
 

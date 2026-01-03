@@ -5,8 +5,6 @@
 using namespace transport;
 using namespace std;
 
-#define __unix__ 1
-#define _WIN32 0
 
 int main()
 {

@@ -9,8 +9,10 @@ namespace protoc
 	{
 	public:
 		PlainProtocol() = default;
-		~PlainProtocol() override;
+		~PlainProtocol() override = default;
 
+		std::vector<char> encode(const Message &mes) override;
 
+		Message decode(const char *data, size_t size) override;
 	};
 }

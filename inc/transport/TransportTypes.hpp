@@ -4,14 +4,10 @@
 #include <string>
 #include <vector>
 
-#ifdef _WIN32
-    #include <windows.h>    
-#elif __unix__
-    #include <fcntl.h>
-    #include <errno.h>
-    #include <termios.h>
-    #include <unistd.h>
-#endif
+#include <fcntl.h>
+#include <errno.h>
+#include <termios.h>
+#include <unistd.h>
 
 namespace transport {
     using ByteBuffer = std::vector<char>;
@@ -152,14 +148,8 @@ namespace transport {
         }
     };
 
-
-#ifdef _WIN32
-
-#elif __unix__
     speed_t baudrate_to_speed_t(BaudRate baudrate);
     unsigned int data_bits_to_csize(DataBits data_bits);
     unsigned int stop_bits_to_cstopb(StopBits stop_bits);
     unsigned int parity_to_cparity(Parity parity);
-
-#endif
 } // namespace transport

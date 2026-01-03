@@ -1,14 +1,15 @@
 #include "protocols/PlainProtocol.hpp"
 
+
 using namespace protoc;
 
-//VectorChar PlainProtocol::decodeData(const VectorChar &mes)
-//{
-//    return mes;
-//}
-//
-//VectorChar PlainProtocol::encodeData(const VectorChar &mes)
-//{
-//    return mes;
-//}
+std::vector<char> PlainProtocol::encode(const Message &mes)
+{
+    auto serialized = mes.serialize();
+    return serialized;
+}
 
+Message PlainProtocol::decode(const char *data, size_t size)
+{
+    return Message::deserialize(data, static_cast<uint8_t>(size));
+}

@@ -72,7 +72,7 @@ public:
                   (static_cast<uint32_t>(rx_buff[5]) << 0);
 
 
-        size_t data_len = msg.len - sizeof(uint32_t);
+        uint8_t data_len = msg.len - sizeof(uint32_t);
 
         std::vector<char> vec;
         vec.assign(rx_buff + 6, rx_buff + 6 + data_len);

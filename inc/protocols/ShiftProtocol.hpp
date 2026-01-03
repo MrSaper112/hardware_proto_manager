@@ -10,18 +10,14 @@ namespace protoc
 	public:
 		ShiftProtocol(uint16_t charShift) : charShift(charShift) {};
 
-		~ShiftProtocol() override;
+		~ShiftProtocol() override = default;
 
-		VectorChar encodeData(const VectorChar &mes);
-		VectorChar decodeData(const VectorChar &mes);
+		std::vector<char> encode(const Message &mes) override;
+		Message decode(const char *data, size_t size) override;
+	private:
 
-    char encodeByte(const char byte) {
-        return static_cast<unsigned char>((byte + charShift) % 256);
-    }
-
-    char decodeByte(const char byte) {
-        return static_cast<unsigned char>((byte - charShift + 256) % 256);
-    }
+		char encodeByte(const char byte);
+		char decodeByte(const char byte);
 
 	private:
 		uint16_t charShift = 0;
