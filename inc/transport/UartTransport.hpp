@@ -10,6 +10,8 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 
+#include <mutex>
+
 #define RX_BUFF_SIZE 1024
 #define TX_BUFF_SIZE 1024
 
@@ -38,7 +40,7 @@ namespace transport
 		int receive(char *buffer, size_t length) override;
 
 	private:
-		void startReciveThread()
+		void startReceiveThread()
 		{
 			m_thread = std::thread(&UartTransport::receiveThread, this);
 		};
@@ -54,7 +56,8 @@ namespace transport
 		char rx_buff[RX_BUFF_SIZE] = {0};
 		char tx_buff[TX_BUFF_SIZE] = {0};
 
-		std::vector<Message> mesRecieveQue;
+		std::vector<Message> mesReceiveQueue;
+		static std::mutex mtxReceive;
 
 		int m_fd{-1};
 		ErrorCode configure_unix();

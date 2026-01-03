@@ -34,7 +34,7 @@ char ShiftProtocol::decodeByte(const char byte)
 
 Message ShiftProtocol::decode(const char *data, size_t size)
 {
-    Message mes = Message::deserialize(data, static_cast<uint8_t>(size));
+    Message mes = Message::deserialize(data, size);
 
     std::vector<char> unshifted;
     unshifted.reserve(mes.data.get().size());

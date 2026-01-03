@@ -7,7 +7,8 @@
 using namespace transport;
 
 UartTransport::UartTransport(const SerialConfig &config) : ITransport(config)
-{}
+{
+}
 
 UartTransport::~UartTransport()
 {
@@ -35,9 +36,9 @@ ErrorCode UartTransport::open()
 
 	try
 	{
-		this->startReciveThread();
+		this->startReceiveThread();
 	}
-	catch (const std::exception ex)
+	catch (const std::exception &ex)
 	{
 		std::cout << ex.what() << std::endl;
 	}
@@ -47,7 +48,7 @@ ErrorCode UartTransport::open()
 void UartTransport::receiveThread()
 {
 	int bytes_count = 0;
-	std::cout << "Starting main recive thread" << std::endl;
+	std::cout << "Starting main receive thread" << std::endl;
 	while (is_open())
 	{
 		bytes_count = this->available();
@@ -84,7 +85,7 @@ void UartTransport::receiveThread()
 			usleep(thread_timeout * 10);
 		}
 
-		bytes_read = this->receive(rx_buff + 1, this->available());
+		bytes_read = this->receive(rx_buff + 1, expected_len);
 		if (bytes_read != expected_len)
 		{
 			std::cout << "Failed to read complete message. Expected: " << static_cast<int>(expected_len) << ", Got: " << bytes_read << std::endl;
@@ -96,7 +97,12 @@ void UartTransport::receiveThread()
 		try
 		{
 			Message mes = Message::deserialize(rx_buff, total_bytes);
-			mesRecieveQue.push_back(mes);
+
+			std::unique_lock<std::mutex> queueLock(mtxReceive);
+			mesReceiveQueue.push_back(mes);
+
+			queueLock.unlock();
+
 			mes.print();
 		}
 		catch (const std::exception &ex)
@@ -109,6 +115,18 @@ void UartTransport::receiveThread()
 
 ErrorCode UartTransport::close()
 {
+    if (!is_open())  
+    {  
+        return ErrorCode::Success;  
+    }  
+
+    if (m_fd >= 0)  
+    {  
+        ::close(m_fd);  
+        m_fd = -1;  
+    }  
+
+	m_con_state = ConnectionState::Closed;
 	return ErrorCode::Success;
 }
 

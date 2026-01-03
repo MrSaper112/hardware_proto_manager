@@ -75,8 +75,8 @@ public:
     {
     }
 
-    VectorChar(std::vector<char> &data)
-        : m_data(data)
+    VectorChar(const std::vector<char> &data)
+        : m_data(std::move(data))
     {
     }
 

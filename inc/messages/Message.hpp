@@ -8,7 +8,7 @@
 #include "MessageTypes.hpp"
 
 class Message
-{   
+{
 public:
     uint8_t len;
     uint32_t idx;
@@ -17,13 +17,13 @@ public:
 
     Message() : len(0), idx(0), mesType(MessageType::Undefined) {};
 
-    Message(uint32_t index, MessageType type): idx(index), mesType(type)
+    Message(uint32_t index, MessageType type) : idx(index), mesType(type)
     {
         this->len = static_cast<uint8_t>(sizeof(idx) + sizeof(mesType));
     }
 
-    template<typename T>
-    Message(uint32_t index, MessageType type, const T& payload) : idx(index), mesType(type), data(payload)
+    template <typename T>
+    Message(uint32_t index, MessageType type, const T &payload) : idx(index), mesType(type), data(payload)
     {
         this->len = static_cast<uint8_t>(sizeof(idx) + sizeof(mesType) + data.get().size());
     }
@@ -49,33 +49,30 @@ public:
         return msg;
     }
 
-    static Message deserialize(const char *rx_buff, uint8_t buff_len)
+    static Message deserialize(const char *rxBuff, size_t buffLen)
     {
-        if (buff_len < 5)
-        {
+        if (buffLen < m_preableSize)
             throw std::runtime_error("Buffer too small:  need at least 5 bytes");
-        }
+        if (buffLen > 255)
+            throw std::runtime_error("Buffer too large: maximum size is 255 bytes");
+
+        uint8_t bufSize = static_cast<uint8_t>(buffLen);
+
         Message msg;
 
-        msg.len = rx_buff[0];
+        msg.len = rxBuff[0];
 
-        if (buff_len < (1 + msg.len))
-        {
-            throw std::runtime_error("Incomplete message in buffer");
-        }
+        msg.mesType = intToMessageType(rxBuff[1]);
 
-        msg.mesType = intToMessageType(rx_buff[1]);
+        msg.idx = (static_cast<uint32_t>(rxBuff[2]) << 24) |
+                  (static_cast<uint32_t>(rxBuff[3]) << 16) |
+                  (static_cast<uint32_t>(rxBuff[4]) << 8) |
+                  (static_cast<uint32_t>(rxBuff[5]) << 0);
 
-        msg.idx = (static_cast<uint32_t>(rx_buff[2]) << 24) |
-                  (static_cast<uint32_t>(rx_buff[3]) << 16) |
-                  (static_cast<uint32_t>(rx_buff[4]) << 8) |
-                  (static_cast<uint32_t>(rx_buff[5]) << 0);
-
-
-        uint8_t data_len = msg.len - sizeof(uint32_t);
+        uint8_t data_len = msg.len - m_preableSize;
 
         std::vector<char> vec;
-        vec.assign(rx_buff + 6, rx_buff + 6 + data_len);
+        vec.assign(rxBuff + m_preableSize, rxBuff + m_preableSize + data_len);
         msg.data = VectorChar(vec);
 
         return msg;
@@ -111,4 +108,7 @@ public:
     {
         return this->idx == mes.idx && this->len == mes.len;
     }
+
+private:
+    static constexpr uint8_t m_preableSize = sizeof(len) + sizeof(mesType) + sizeof(idx);
 };

@@ -11,5 +11,5 @@ std::vector<char> PlainProtocol::encode(const Message &mes)
 
 Message PlainProtocol::decode(const char *data, size_t size)
 {
-    return Message::deserialize(data, static_cast<uint8_t>(size));
+    return Message::deserialize(data, size);
 }
