@@ -51,12 +51,10 @@ public:
 
     static Message deserialize(const char *rxBuff, size_t buffLen)
     {
-        if (buffLen < m_preableSize)
+        if (buffLen < m_preambleSize)
             throw std::runtime_error("Buffer too small:  need at least 5 bytes");
         if (buffLen > 255)
             throw std::runtime_error("Buffer too large: maximum size is 255 bytes");
-
-        uint8_t bufSize = static_cast<uint8_t>(buffLen);
 
         Message msg;
 
@@ -69,10 +67,8 @@ public:
                   (static_cast<uint32_t>(rxBuff[4]) << 8) |
                   (static_cast<uint32_t>(rxBuff[5]) << 0);
 
-        uint8_t data_len = msg.len - m_preableSize;
-
         std::vector<char> vec;
-        vec.assign(rxBuff + m_preableSize, rxBuff + m_preableSize + data_len);
+        vec.assign(rxBuff + m_preambleSize, rxBuff + msg.len + 1);
         msg.data = VectorChar(vec);
 
         return msg;
@@ -110,5 +106,5 @@ public:
     }
 
 private:
-    static constexpr uint8_t m_preableSize = sizeof(len) + sizeof(mesType) + sizeof(idx);
+    static constexpr uint8_t m_preambleSize = sizeof(len) + sizeof(mesType) + sizeof(idx);
 };
