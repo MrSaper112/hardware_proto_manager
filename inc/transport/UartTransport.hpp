@@ -57,7 +57,7 @@ namespace transport
 		char tx_buff[TX_BUFF_SIZE] = {0};
 
 		std::vector<Message> mesReceiveQueue;
-		static std::mutex mtxReceive;
+		std::mutex mtxReceive;
 
 		int m_fd{-1};
 		ErrorCode configure_unix();

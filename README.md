@@ -28,5 +28,12 @@ A C++20 CMake project for managing hardware protocols, devices, and transport la
 
 4. **Run the executable**:
    ```bash
-   ./hardware_proto
+   ./hardware_proto               # Runs TestDevice with plain protocol
+   ./hardware_proto led           # Runs LedController with plain protocol  
+
+   ./hardware_proto plain test    # Runs TestDevice with plain protocol
+   ./hardware_proto plain led     # Runs LedController with plain protocol
+   
+   ./hardware_proto shift         # Runs TestDevice with shift protocol
+   ./hardware_proto shift led     # Runs LedController with shift protocol
    ```
