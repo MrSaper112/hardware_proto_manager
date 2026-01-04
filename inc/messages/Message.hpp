@@ -56,8 +56,6 @@ public:
         if (buffLen > 255)
             throw std::runtime_error("Buffer too large: maximum size is 255 bytes");
 
-        uint8_t bufSize = static_cast<uint8_t>(buffLen);
-
         Message msg;
 
         msg.len = rxBuff[0];
@@ -69,7 +67,7 @@ public:
                   (static_cast<uint32_t>(rxBuff[4]) << 8) |
                   (static_cast<uint32_t>(rxBuff[5]) << 0);
 
-        uint8_t data_len = msg.len - m_preableSize;
+        uint8_t data_len = msg.len - m_preableSize + 1;
 
         std::vector<char> vec;
         vec.assign(rxBuff + m_preableSize, rxBuff + m_preableSize + data_len);
