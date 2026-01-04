@@ -5,17 +5,20 @@ LedControllerDevice::LedControllerDevice(transport::ITransport *transport, proto
 
 void LedControllerDevice::connect()
 {
-    if (m_transport)
+    if (m_transport == nullptr)
     {
-        auto status = m_transport->open();
-        if (status == transport::ErrorCode::Success)
-        {
-            std::cout << TAG << "Connected successfully" << std::endl;
-        }
-        else
-        {
-            std::cout << TAG << "Failed to connect: " << static_cast<int>(status) << std::endl;
-        }
+        throw std::runtime_error("Transport not initialized");
+    }
+
+    auto status = m_transport->open();
+    if (status == transport::ErrorCode::Success)
+    {
+        std::cout << TAG << "Connected successfully" << std::endl;
+    }
+    else
+    {
+        std::cout << TAG << "Failed to connect: " << static_cast<int>(status) << std::endl;
+        throw std::runtime_error("Failed to connect, transport error code: " + std::to_string(static_cast<int>(status)));  
     }
 }
 
@@ -86,10 +89,7 @@ void LedControllerDevice::setBrightness(uint8_t level)
     {
         std::vector<char> cmdData = {LedCommand::SetBrightness, m_ledPin.getPinChar(), m_ledPin.getPort(), static_cast<char>(level)};
 
-        std::vector<char> brightnessData = m_ledPin.toVectorChar();
-        brightnessData.push_back(static_cast<char>(level));
-
-        auto cmd = m_protocol->createCommand(brightnessData);
+        auto cmd = m_protocol->createCommand(cmdData);
         auto encoded = m_protocol->encode(cmd);
         m_transport->send(encoded.data(), encoded.size());
         std::cout << TAG << "Set Brightness command sent with level: " << level << std::endl;

@@ -8,17 +8,20 @@ TestDevice::TestDevice(transport::ITransport *transport, protoc::IProtocolAdapte
 
 void TestDevice::connect()
 {
-    if (m_transport)
+    if (m_transport == nullptr)
     {
-        auto status = m_transport->open();
-        if (status == transport::ErrorCode::Success)
-        {
-            std::cout << TAG << "Connected successfully" << std::endl;
-        }
-        else
-        {
-            std::cout << TAG << "Failed to connect: " << static_cast<int>(status) << std::endl;
-        }
+        throw std::runtime_error("Transport not initialized");
+    }
+
+    auto status = m_transport->open();
+    if (status == transport::ErrorCode::Success)
+    {
+        std::cout << TAG << "Connected successfully" << std::endl;
+    }
+    else
+    {
+        std::cout << TAG << "Failed to connect: " << static_cast<int>(status) << std::endl;
+        throw std::runtime_error("Failed to connect, transport error code: " + std::to_string(static_cast<int>(status)));
     }
 }
 

@@ -34,6 +34,8 @@ A C++20 CMake project for managing hardware protocols, devices, and transport la
    ./hardware_proto plain test    # Runs TestDevice with plain protocol
    ./hardware_proto plain led     # Runs LedController with plain protocol
    
-   ./hardware_proto shift         # Runs TestDevice with shift protocol
-   ./hardware_proto shift led     # Runs LedController with shift protocol
+   ./hardware_proto shift            # Runs TestDevice with shift protocol (default 0x69)
+   ./hardware_proto shift led        # Runs LedController with shift protocol (default 0x69)
+   ./hardware_proto shift 0x21       # Runs TestDevice with shift protocol (custom value)
+   ./hardware_proto shift 0x31 led   # Runs LedController with shift protocol (custom value)
    ```
