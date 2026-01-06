@@ -4,7 +4,13 @@
 #include <iomanip>
 
 TestDevice::TestDevice(transport::ITransport *transport, protoc::IProtocolAdapter *protocol)
-    : IDevice(protocol, transport) {}
+    : IDevice(protocol, transport)
+
+{
+    transport->subscribeReceive([this](const Message &mes) {
+        this->onNotifyReceive(mes);
+    });
+}
 
 void TestDevice::connect()
 {

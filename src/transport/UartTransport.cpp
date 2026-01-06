@@ -97,13 +97,12 @@ void UartTransport::receiveThread()
 		try
 		{
 			Message mes = Message::deserialize(rx_buff, total_bytes);
-
+			mes.print();
 			std::unique_lock<std::mutex> queueLock(mtxReceive);
-			mesReceiveQueue.push_back(mes);
+
+			notifyReceive(mes);
 
 			queueLock.unlock();
-
-			mes.print();
 		}
 		catch (const std::exception &ex)
 		{
@@ -178,11 +177,6 @@ int UartTransport::available() const
 	}
 
 	return bytes;
-}
-
-ErrorCode UartTransport::flush()
-{
-	return ErrorCode::Success;
 }
 
 ErrorCode transport::UartTransport::configure_unix()

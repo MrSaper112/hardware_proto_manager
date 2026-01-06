@@ -10,6 +10,8 @@
 #include <unistd.h>
 
 #include "TransportTypes.hpp"
+#include <functional>
+#include "../messages/Message.hpp"
 
 namespace transport {
 	class ITransport {
@@ -25,6 +27,7 @@ namespace transport {
 			return m_con_state;
 		};
 
+	public:
 		virtual int send(const char* data, size_t length) = 0;
 		virtual int send(const ByteBuffer& data) {
 			return send(data.data(), data.size());
@@ -50,10 +53,24 @@ namespace transport {
 		}
 
 		virtual int available() const = 0;
-		virtual ErrorCode flush() = 0;
 		virtual SerialConfig get_config() const = 0;
 
+	public:
+		void subscribeReceive(std::function<void(const Message&)> callback)
+		{
+			receive_callbacks.push_back(callback);
+		}
+
+		void notifyReceive(const Message& data)
+		{
+			for (const auto& callback : receive_callbacks)
+			{
+				callback(data);
+			}
+		}
+
 	protected:
+		std::vector<std::function<void(const Message&)>> receive_callbacks;
 		SerialConfig m_config;
 		ConnectionState m_con_state{ ConnectionState::Closed };
 	};

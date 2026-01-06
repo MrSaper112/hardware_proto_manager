@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include "MessageTypes.hpp"
 
+
 class Message
 {
 public:
