@@ -2,54 +2,58 @@
 
 #include "IDevice.hpp"
 
-class LedPin
+namespace wm::devices
 {
-public:
-	LedPin(uint8_t pin_number, char port) : pin_number(pin_number), port(port) {}
-
-	char getPort() const { return port; }
-	
-	uint8_t getPinNumber() const { return pin_number; }
-	char getPinChar() const { return static_cast<char>(pin_number); }
-
-
-
-	std::vector<char> toVectorChar() const
+	class LedPin
 	{
-		std::vector<char> vec;
-		vec.push_back(getPinChar());
-		vec.push_back(port);
-		return vec;
-	}	
-private:
-	uint8_t pin_number;
-	char port;
-};
+	public:
+		LedPin(uint8_t pin_number, char port) : pin_number(pin_number), port(port) {}
 
-enum LedCommand : char {
-	TurnOn = 1,
-	TurnOff = 2,
-	SetBrightness = 3
-	
-};
+		char getPort() const { return port; }
 
-class LedControllerDevice : public IDevice {
-public:
-	LedControllerDevice(transport::ITransport *transport, protoc::IProtocolAdapter *protocol);
-	
-	LedControllerDevice(const LedPin& ledPin, transport::ITransport *transport, protoc::IProtocolAdapter *protocol):
-		IDevice(protocol, transport), m_ledPin(ledPin) {};
+		uint8_t getPinNumber() const { return pin_number; }
+		char getPinChar() const { return static_cast<char>(pin_number); }
 
-    ~LedControllerDevice() = default;
+		std::vector<char> toVectorChar() const
+		{
+			std::vector<char> vec;
+			vec.push_back(getPinChar());
+			vec.push_back(port);
+			return vec;
+		}
 
-    void connect() override;
-    void disconnect() override;
+	private:
+		uint8_t pin_number;
+		char port;
+	};
 
-	void turnOn();
-	void turnOff();
-	void setBrightness(uint8_t level);
+	enum LedCommand : char
+	{
+		TurnOn = 1,
+		TurnOff = 2,
+		SetBrightness = 3
 
-	static constexpr const char* TAG = "[LedControllerDevice] ";
-private:
-	LedPin m_ledPin{13, 'A'};
-};
+	};
+
+	class LedControllerDevice : public IDevice
+	{
+	public:
+		LedControllerDevice(transport::ITransport *transport, protoc::IProtocolAdapter *protocol);
+
+		LedControllerDevice(const LedPin &ledPin, transport::ITransport *transport, protoc::IProtocolAdapter *protocol) : IDevice(protocol, transport), m_ledPin(ledPin) {};
+
+		~LedControllerDevice() = default;
+
+		void connect() override;
+		void disconnect() override;
+
+		void turnOn();
+		void turnOff();
+		void setBrightness(uint8_t level);
+
+		static constexpr const char *TAG = "[LedControllerDevice] ";
+
+	private:
+		LedPin m_ledPin{13, 'A'};
+	};
+}

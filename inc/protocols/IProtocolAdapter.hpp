@@ -7,7 +7,9 @@
 #include <cstring>
 #include <concepts>
 
-namespace protoc
+using namespace wm::messages;
+
+namespace wm::protoc
 {
 	class IProtocolAdapter
 	{

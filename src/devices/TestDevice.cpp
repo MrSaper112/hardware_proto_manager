@@ -3,13 +3,14 @@
 #include <sstream>
 #include <iomanip>
 
+using namespace wm::devices;
+
 TestDevice::TestDevice(transport::ITransport *transport, protoc::IProtocolAdapter *protocol)
     : IDevice(protocol, transport)
 
 {
-    transport->subscribeReceive([this](const Message &mes) {
-        this->onNotifyReceive(mes);
-    });
+    transport->subscribeReceive([this](const Message &mes)
+                                { this->onNotifyReceive(mes); });
 }
 
 void TestDevice::connect()

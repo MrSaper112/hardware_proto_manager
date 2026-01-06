@@ -1,5 +1,7 @@
 #include "devices/LedControllerDevice.hpp"
 
+using namespace wm::devices;
+
 LedControllerDevice::LedControllerDevice(transport::ITransport *transport, protoc::IProtocolAdapter *protocol)
     : IDevice(protocol, transport) {}
 
@@ -18,7 +20,7 @@ void LedControllerDevice::connect()
     else
     {
         std::cout << TAG << "Failed to connect: " << static_cast<int>(status) << std::endl;
-        throw std::runtime_error("Failed to connect, transport error code: " + std::to_string(static_cast<int>(status)));  
+        throw std::runtime_error("Failed to connect, transport error code: " + std::to_string(static_cast<int>(status)));
     }
 }
 
@@ -37,9 +39,9 @@ void LedControllerDevice::turnOn()
     {
         throw std::runtime_error("Protocol or Transport not initialized");
     }
-    
+
     try
-    {   
+    {
         // Construct command data: [PIN_STATE, PIN_NUMBER, PORT]
         std::vector<char> cmdData = {LedCommand::TurnOn, m_ledPin.getPinChar(), m_ledPin.getPort()};
 
