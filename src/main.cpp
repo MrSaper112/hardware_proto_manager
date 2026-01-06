@@ -1,16 +1,10 @@
 ﻿#include "main.hpp"
-#include "messages/Message.hpp"
-#include "devices/TestDevice.hpp"
-#include "devices/LedControllerDevice.hpp"
-#include "protocols/PlainProtocol.hpp"
-#include "protocols/ShiftProtocol.hpp"
-#include <format>
-#include <cstring>
-#include <thread>
-#include <chrono>
 
-using namespace transport;
-using namespace protoc;
+
+using namespace wm::transport;
+using namespace wm::protoc;
+using namespace wm::messages;
+using namespace wm::devices;
 using namespace std;
 
 void runTestDevice(ITransport *transport, IProtocolAdapter *protocol)

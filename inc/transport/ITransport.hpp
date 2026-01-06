@@ -13,7 +13,9 @@
 #include <functional>
 #include "../messages/Message.hpp"
 
-namespace transport {
+using namespace wm::messages;
+
+namespace wm::transport {
 	class ITransport {
 	public:
 		ITransport(const SerialConfig& config) : m_config(config) {};

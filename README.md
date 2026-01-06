@@ -8,25 +8,17 @@ A C++20 CMake project for managing hardware protocols, devices, and transport la
 
 #### Standard Build Process
 
-1. **Navigate to the project directory**:
+1. **Navigate to the project directory, change build to executable**:
    ```bash
-   cd ~/hardware_proto/hardware_proto_manager
-   mkdir build
-   cd build
-   cmake .. -DCMAKE_BUILD_TYPE=Release
-   ```
-   
-   For Debug build:
-   ```bash
-   cmake .. -DCMAKE_BUILD_TYPE=Debug
+   sudo chmod -x build.sh
    ```
 
-3. **Build the project**:
+2. **Build the project**:
    ```bash
-   cmake --build . -j$(nproc)
+   ./build.sh
    ```
 
-4. **Run the executable**:
+3. **Run the executable**:
    ```bash
    ./hardware_proto               # Runs TestDevice with plain protocol
    ./hardware_proto led           # Runs LedController with plain protocol  

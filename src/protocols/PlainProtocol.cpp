@@ -1,7 +1,6 @@
 #include "protocols/PlainProtocol.hpp"
 
-
-using namespace protoc;
+using namespace wm::protoc;
 
 std::vector<char> PlainProtocol::encode(const Message &mes)
 {

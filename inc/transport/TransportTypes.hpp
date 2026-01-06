@@ -9,7 +9,7 @@
 #include <termios.h>
 #include <unistd.h>
 
-namespace transport {
+namespace wm::transport {
     using ByteBuffer = std::vector<char>;
     using PortName = std::string;
     using Timestamp = uint64_t;
@@ -152,4 +152,4 @@ namespace transport {
     unsigned int data_bits_to_csize(DataBits data_bits);
     unsigned int stop_bits_to_cstopb(StopBits stop_bits);
     unsigned int parity_to_cparity(Parity parity);
-} // namespace transport
+} // namespace wm::transport

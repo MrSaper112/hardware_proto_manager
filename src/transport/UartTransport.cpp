@@ -4,7 +4,7 @@
 #include <cstring>
 #include <thread>
 
-using namespace transport;
+using namespace wm::transport;
 
 UartTransport::UartTransport(const SerialConfig &config) : ITransport(config)
 {
@@ -114,16 +114,16 @@ void UartTransport::receiveThread()
 
 ErrorCode UartTransport::close()
 {
-    if (!is_open())  
-    {  
-        return ErrorCode::Success;  
-    }  
+	if (!is_open())
+	{
+		return ErrorCode::Success;
+	}
 
-    if (m_fd >= 0)  
-    {  
-        ::close(m_fd);  
-        m_fd = -1;  
-    }  
+	if (m_fd >= 0)
+	{
+		::close(m_fd);
+		m_fd = -1;
+	}
 
 	m_con_state = ConnectionState::Closed;
 	return ErrorCode::Success;
@@ -179,7 +179,7 @@ int UartTransport::available() const
 	return bytes;
 }
 
-ErrorCode transport::UartTransport::configure_unix()
+ErrorCode UartTransport::configure_unix()
 {
 	struct termios options;
 	std::cout << "Opening port: " << m_config.port << std::endl;

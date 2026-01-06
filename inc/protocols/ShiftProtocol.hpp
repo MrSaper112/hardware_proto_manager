@@ -3,7 +3,7 @@
 #include "IProtocolAdapter.hpp"
 #include <cstdint>
 
-namespace protoc
+namespace wm::protoc
 {
 	class ShiftProtocol : public IProtocolAdapter
 	{

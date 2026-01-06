@@ -1,7 +1,6 @@
 #include "protocols/ShiftProtocol.hpp"
 
-using namespace protoc;
-
+using namespace wm::protoc;
 
 std::vector<char> ShiftProtocol::encode(const Message &mes)
 {
@@ -16,7 +15,7 @@ std::vector<char> ShiftProtocol::encode(const Message &mes)
 
     Message encodedMessage = mes;
     encodedMessage.data = VectorChar(shifted);
-    
+
     auto serialized = encodedMessage.serialize();
 
     return serialized;

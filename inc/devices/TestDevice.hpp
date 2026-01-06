@@ -4,30 +4,33 @@
 #include <vector>
 #include <cstdint>
 
-
-class TestDevice : public IDevice
+namespace wm::devices
 {
-public:
-    TestDevice(transport::ITransport *transport, protoc::IProtocolAdapter *protocol);
-
-    ~TestDevice() = default;
-
-    void connect() override;
-    void disconnect() override;
-
-    bool sendCommand(uint32_t idx, const std::vector<char> &data);
-    bool sendResponse(uint32_t idx, const std::vector<char> &data);
-    bool sendData(uint32_t idx, const std::vector<char> &data);
-    bool sendHeartbeat(uint32_t idx);
-
-	void onNotifyReceive(const Message& data) override 
+    class TestDevice : public IDevice
     {
-        std::cout << TAG << "Received message notification:" << std::endl;
-        data.print();
-    }
+    public:
+        TestDevice(transport::ITransport *transport, protoc::IProtocolAdapter *protocol);
 
-    static constexpr const char* TAG = "[TestDevice] ";
-private:
-    bool sendTestMessage(uint32_t idx, MessageType type, const std::vector<char> &data);
-    bool sendRaw(const std::vector<char> &data);
-};
+        ~TestDevice() = default;
+
+        void connect() override;
+        void disconnect() override;
+
+        bool sendCommand(uint32_t idx, const std::vector<char> &data);
+        bool sendResponse(uint32_t idx, const std::vector<char> &data);
+        bool sendData(uint32_t idx, const std::vector<char> &data);
+        bool sendHeartbeat(uint32_t idx);
+
+        void onNotifyReceive(const Message &data) override
+        {
+            std::cout << TAG << "Received message notification:" << std::endl;
+            data.print();
+        }
+
+        static constexpr const char *TAG = "[TestDevice] ";
+
+    private:
+        bool sendTestMessage(uint32_t idx, MessageType type, const std::vector<char> &data);
+        bool sendRaw(const std::vector<char> &data);
+    };
+}
