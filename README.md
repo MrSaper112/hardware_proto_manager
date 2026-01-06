@@ -10,15 +10,12 @@ A C++20 CMake project for managing hardware protocols, devices, and transport la
 
 1. **Navigate to the project directory**:
    ```bash
-   cd ~/hardware_proto/hardware_proto_manager
-   mkdir build
-   cd build
-   cmake .. -DCMAKE_BUILD_TYPE=Release
+   sudo chmod -x build.sh
    ```
    
-   For Debug build:
+   To build:
    ```bash
-   cmake .. -DCMAKE_BUILD_TYPE=Debug
+   ./build.sh
    ```
 
 3. **Build the project**:
