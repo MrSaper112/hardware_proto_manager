@@ -20,6 +20,12 @@ public:
     bool sendData(uint32_t idx, const std::vector<char> &data);
     bool sendHeartbeat(uint32_t idx);
 
+	void onNotifyReceive(const Message& data) override 
+    {
+        std::cout << TAG << "Received message notification:" << std::endl;
+        data.print();
+    }
+
     static constexpr const char* TAG = "[TestDevice] ";
 private:
     bool sendTestMessage(uint32_t idx, MessageType type, const std::vector<char> &data);

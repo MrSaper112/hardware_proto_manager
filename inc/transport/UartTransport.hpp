@@ -29,7 +29,6 @@ namespace transport
 	public:
 		int sendMessage(const Message *mes);
 		int available() const override;
-		ErrorCode flush() override;
 
 		SerialConfig get_config() const override
 		{
@@ -56,7 +55,6 @@ namespace transport
 		char rx_buff[RX_BUFF_SIZE] = {0};
 		char tx_buff[TX_BUFF_SIZE] = {0};
 
-		std::vector<Message> mesReceiveQueue;
 		std::mutex mtxReceive;
 
 		int m_fd{-1};
