@@ -2,7 +2,7 @@ name: Deploy Doxygen Documentation to GitHub Pages
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "dev/add_doxygen_docs"]
   workflow_dispatch:
 
 permissions:
