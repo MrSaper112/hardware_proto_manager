@@ -1,0 +1,64 @@
+PROJECT_NAME           = "HardwareProtoManager"
+PROJECT_VERSION        = "1.0.0"
+PROJECT_BRIEF          = "Embedded hardware communication protocol manager"
+
+INPUT                  = ../inc/ ../src/ ../README.md ./*.md
+FILE_PATTERNS          = *.hpp *.h *.cpp *.md
+RECURSIVE              = YES
+EXCLUDE_PATTERNS       = */build/* */CMakeFiles/*
+
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+QUIET                  = NO
+WARNINGS               = YES
+
+OUTPUT_DIRECTORY       = .
+GENERATE_HTML          = YES
+GENERATE_MARKDOWN      = NO
+GENERATE_LATEX         = NO
+GENERATE_MAN           = NO
+GENERATE_RTF           = NO
+GENERATE_XML           = NO
+
+# HTML Output for GitHub Pages
+HTML_OUTPUT            = html
+HTML_FILE_EXTENSION    = .html
+HTML_COLORSTYLE_HUE    = 220
+HTML_COLORSTYLE_SAT    = 100
+HTML_COLORSTYLE_GAMMA  = 80
+
+USE_MDFILE_AS_MAINPAGE = ../README.md
+
+SEARCHENGINE           = YES
+SERVER_BASED_SEARCH    = NO
+DISABLE_INDEX          = NO
+GENERATE_TREEVIEW      = YES
+FULL_SIDEBAR           = NO
+
+ALPHABETICAL_INDEX     = YES
+HTML_DYNAMIC_MENUS     = YES
+HTML_DYNAMIC_SECTIONS  = YES
+
+SOURCE_BROWSER         = YES
+INLINE_SOURCES         = NO
+REFERENCES_LINK_SOURCE = YES
+SOURCE_TOOLTIPS        = YES
+VERBATIM_HEADERS       = YES
+
+HAVE_DOT               = YES
+DOT_IMAGE_FORMAT       = svg
+INTERACTIVE_SVG        = YES
+CLASS_DIAGRAMS         = YES
+CLASS_GRAPH            = YES
+COLLABORATION_GRAPH    = YES
+INCLUDE_GRAPH          = YES
+INCLUDED_BY_GRAPH      = YES
+CALL_GRAPH             = YES
+CALLER_GRAPH           = YES
+DOT_TRANSPARENT        = YES
+
+HTML_EXTRA_STYLESHEET  = 
+HTML_EXTRA_FILES       = 
+HTML_COLORSTYLE        = LIGHT
+HTML_TIMESTAMP         = YES

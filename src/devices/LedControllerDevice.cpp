@@ -35,11 +35,6 @@ void LedControllerDevice::disconnect()
 
 void LedControllerDevice::turnOn()
 {
-    if (!m_protocol || !m_transport)
-    {
-        throw std::runtime_error("Protocol or Transport not initialized");
-    }
-
     try
     {
         // Construct command data: [PIN_STATE, PIN_NUMBER, PORT]
@@ -59,11 +54,6 @@ void LedControllerDevice::turnOn()
 
 void LedControllerDevice::turnOff()
 {
-    if (!m_protocol || !m_transport)
-    {
-        throw std::runtime_error("Protocol or Transport not initialized");
-    }
-
     try
     {
         std::vector<char> cmdData = {LedCommand::TurnOff, m_ledPin.getPinChar(), m_ledPin.getPort()};
@@ -82,11 +72,6 @@ void LedControllerDevice::turnOff()
 
 void LedControllerDevice::setBrightness(uint8_t level)
 {
-    if (!m_protocol || !m_transport)
-    {
-        throw std::runtime_error("Protocol or Transport not initialized");
-    }
-
     try
     {
         std::vector<char> cmdData = {LedCommand::SetBrightness, m_ledPin.getPinChar(), m_ledPin.getPort(), static_cast<char>(level)};

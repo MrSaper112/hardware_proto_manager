@@ -26,3 +26,7 @@ CTestTestfile.cmake
 *.slo
 
 .venv/
+
+# Generated Doxygen documentation (built by GitHub Actions)
+docs/html/
+docs/xml/
