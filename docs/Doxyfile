@@ -2,7 +2,7 @@ PROJECT_NAME           = "HardwareProtoManager"
 PROJECT_VERSION        = "1.0.0"
 PROJECT_BRIEF          = "Embedded hardware communication protocol manager"
 
-INPUT                  = ../inc/ ../src/ ../README.md ./*.md
+INPUT                  = ../inc/ ../src/ ../README.md ./
 FILE_PATTERNS          = *.hpp *.h *.cpp *.md
 RECURSIVE              = YES
 EXCLUDE_PATTERNS       = */build/* */CMakeFiles/*
