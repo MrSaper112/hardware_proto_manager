@@ -15,11 +15,6 @@ TestDevice::TestDevice(transport::ITransport *transport, protoc::IProtocolAdapte
 
 void TestDevice::connect()
 {
-    if (m_transport == nullptr)
-    {
-        throw std::runtime_error("Transport not initialized");
-    }
-
     auto status = m_transport->open();
     if (status == transport::ErrorCode::Success)
     {

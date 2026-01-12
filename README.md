@@ -1,8 +1,17 @@
 # hardware_proto_manager
 
-A C++20 CMake project for managing hardware protocols, devices, and transport layers.
+A project for managing hardware protocols, devices, and transport layers.
+
+## Documentation
+
+You can find documentation in a link below: 
+[Documentation Link](https://mrsaper112.github.io/hardware_proto_manager/index.html)
 
 ## Building the Project
+
+Requirements
+CMake ⩾ 3.21
+C++ Compiler with C++ 20 support
 
 ### Linux
 
